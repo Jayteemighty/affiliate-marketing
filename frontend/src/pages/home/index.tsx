@@ -7,20 +7,21 @@ const HomePage: React.FC = () => {
       <div className="container mx-auto px-4 py-8">
         {/* Hero Section */}
         <section className="text-center">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
             Start Earning by Promoting Digital Products
           </h1>
-          <p className="text-lg text-gray-600">
+          <p className="text-lg md:text-xl text-gray-600">
             Unlock the Power Within: Empower Yourself to Unleash Your Full
-            Potential, Transform Your Life, and Achieve Unparalleled Success.
+            Potential, Transform Your Life, and Achieve Unparalleled Success by
+            Implementing What You Learn, Overcoming Obstacles, and Embracing a
+            Growth Mindset that Fuels Your Passion, Ignites Your Creativity, and
+            Unlocks Your Earning Potential.
           </p>
         </section>
 
         {/* Features Section */}
         <section className="mt-12">
-          <h2 className="text-3xl font-bold text-center mb-8">
-            What We Offer
-          </h2>
+          <h2 className="text-3xl font-bold text-center mb-8">What We Offer</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Feature 1 */}
             <div className="bg-white shadow-md rounded-lg p-6">
@@ -28,8 +29,10 @@ const HomePage: React.FC = () => {
                 Quick & Secure Payments
               </h3>
               <p className="text-gray-600">
-                Receive your affiliate earnings quickly and securely. Weekly
-                payouts directly to your bank account.
+                Receive your affiliate earnings quickly and securely. We ensure
+                timely payments directly to your bank account every week, so you
+                can focus on growing your business and increasing your
+                commissions.
               </p>
             </div>
 
@@ -39,8 +42,9 @@ const HomePage: React.FC = () => {
                 Generous Commission Structure
               </h3>
               <p className="text-gray-600">
-                Earn up to 75% commission on each sale. Maximize your income
-                potential.
+                We offer a generous commission structure for our affiliates. Earn
+                up to 75% commission on each sale, giving you the potential to
+                earn significant income while promoting top-quality products.
               </p>
             </div>
 
@@ -50,8 +54,9 @@ const HomePage: React.FC = () => {
                 Extensive Affiliate Network
               </h3>
               <p className="text-gray-600">
-                Join a growing network of successful affiliates. Access a wide
-                range of products to promote.
+                Join a growing network of successful affiliates. Gain access to a
+                wide range of products to promote, allowing you to expand your
+                income and reach new customers effectively.
               </p>
             </div>
           </div>
@@ -81,6 +86,26 @@ const HomePage: React.FC = () => {
                 trading."
               </p>
               <p className="font-bold mt-2">- Shittu Nimotallahi</p>
+            </div>
+
+            {/* Testimonial 3 */}
+            <div className="bg-white shadow-md rounded-lg p-6">
+              <p className="text-gray-600">
+                "I was skeptical at first, but Profit Plus proved me wrong. I
+                learned 3D animation and started making money creating content for
+                brands."
+              </p>
+              <p className="font-bold mt-2">- Qazeem Aisha</p>
+            </div>
+
+            {/* Testimonial 4 */}
+            <div className="bg-white shadow-md rounded-lg p-6">
+              <p className="text-gray-600">
+                "Profit Plus gave me the tools and confidence to succeed. The
+                weekly payouts are reliable, and the community is incredibly
+                supportive."
+              </p>
+              <p className="font-bold mt-2">- Ibrahim Awwal</p>
             </div>
           </div>
         </section>
