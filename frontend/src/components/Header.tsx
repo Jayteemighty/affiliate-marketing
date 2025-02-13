@@ -5,7 +5,7 @@ const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <header className="bg-gradient-to-r from-blue-700 to-purple-700 text-white shadow-lg">
+    <header className="bg-gradient-to-r bg-gray-800 text-white shadow-lg">
       <div className="container mx-auto px-4 flex justify-between items-center py-4">
         {/* Logo or Brand Name */}
         <h1 className="text-2xl font-bold">Profit Plus</h1>

@@ -6,7 +6,7 @@ const HomePage: React.FC = () => {
     <DefaultLayout>
       <div className="container mx-auto px-4 py-8">
         {/* Hero Section */}
-        <section className="text-center bg-gradient-to-r from-blue-600 to-purple-600 py-16 rounded-lg shadow-lg mb-12">
+        <section className="text-center bg-gradient-to-r bg-gray-800 py-16 rounded-lg shadow-lg mb-12">
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
             Start Earning by Promoting Digital Products
           </h1>
@@ -114,7 +114,7 @@ const HomePage: React.FC = () => {
         </section>
 
         {/* Call to Action */}
-        <section className="mt-12 text-center bg-gradient-to-r from-blue-600 to-purple-600 py-16 rounded-lg shadow-lg">
+        <section className="mt-12 text-center bg-gradient-to-r bg-gray-800 py-16 rounded-lg shadow-lg">
           <h2 className="text-3xl font-bold text-white mb-6">
             Join Our Affiliate Program and Start Earning Today!
           </h2>
