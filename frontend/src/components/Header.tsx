@@ -1,18 +1,31 @@
 import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
+import logo from "../assets/result (3).png";
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
 
   return (
     <header className="bg-gradient-to-r bg-gray-800 text-white shadow-lg">
       <div className="container mx-auto px-4 flex justify-between items-center py-4">
         {/* Logo or Brand Name */}
-        <h1 className="text-2xl font-bold">Profit Plus</h1>
+        <nav className="bg-gray-800 flex items-center">
+          <NavLink to="/" className="navbar-brand flex items-center">
+            <img
+              src={logo}
+              alt="ProfitPlus"
+              className="h-20 w-auto hover:opacity-80 transition-opacity duration-300"
+            />
+          </NavLink>
+        </nav>
 
         {/* Mobile Menu Toggle */}
         <button
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
+          onClick={toggleMenu}
           className="md:hidden p-2 focus:outline-none"
           aria-label="Toggle navigation menu"
         >
@@ -43,7 +56,7 @@ const Header: React.FC = () => {
 
         {/* Navigation Links */}
         <nav
-          className={`md:flex md:space-x-6 md:static absolute md:bg-transparent bg-blue-800 md:shadow-none shadow-lg md:py-0 py-4 md:top-0 top-full left-0 right-0 transition-all duration-300 ease-in-out ${
+          className={`md:flex md:space-x-6 md:static absolute md:bg-transparent bg-gray-800 md:shadow-none shadow-lg md:py-0 py-4 md:top-0 top-16 left-0 right-0 transition-all duration-300 ease-in-out ${
             isMenuOpen ? "block" : "hidden"
           }`}
         >
@@ -60,6 +73,7 @@ const Header: React.FC = () => {
                   }`
                 }
                 aria-label="Home"
+                onClick={toggleMenu}
               >
                 Home
               </NavLink>
@@ -77,6 +91,7 @@ const Header: React.FC = () => {
                   }`
                 }
                 aria-label="About Us"
+                onClick={toggleMenu}
               >
                 About Us
               </NavLink>
@@ -94,6 +109,7 @@ const Header: React.FC = () => {
                   }`
                 }
                 aria-label="Affiliates"
+                onClick={toggleMenu}
               >
                 Affiliates
               </NavLink>
@@ -111,6 +127,7 @@ const Header: React.FC = () => {
                   }`
                 }
                 aria-label="Vendors"
+                onClick={toggleMenu}
               >
                 Vendors
               </NavLink>
@@ -128,6 +145,7 @@ const Header: React.FC = () => {
                   }`
                 }
                 aria-label="FAQ"
+                onClick={toggleMenu}
               >
                 FAQ
               </NavLink>
@@ -145,6 +163,7 @@ const Header: React.FC = () => {
                   }`
                 }
                 aria-label="Login"
+                onClick={toggleMenu}
               >
                 Login
               </NavLink>
@@ -162,6 +181,7 @@ const Header: React.FC = () => {
                   }`
                 }
                 aria-label="Create Account"
+                onClick={toggleMenu}
               >
                 Create Account
               </NavLink>
