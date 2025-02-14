@@ -18,17 +18,39 @@ const productData: Product[] = [
 
 const ProductsPage: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    
+
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
+
   return (
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
       <Sidebar isOpen={isSidebarOpen} onClose={toggleSidebar} />
 
       {/* Main Content Area */}
-      <div className="flex-grow flex flex-col items-center justify-center p-4 md:p-8">
+      <div className="flex-grow p-4 md:p-8 overflow-y-auto ml-0 md:ml-64">
+        {/* Hamburger Menu Button (Mobile Only) */}
+        <button
+          onClick={toggleSidebar}
+          className="md:hidden p-2 bg-gray-800 text-white rounded-md mb-4"
+        >
+          <svg
+            className="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M4 6h16M4 12h16m-7 6h7"
+            ></path>
+          </svg>
+        </button>
+
         {/* Header */}
         <h1 className="text-3xl font-bold text-purple-700 text-center mb-8">
           My Products
@@ -38,7 +60,7 @@ const ProductsPage: React.FC = () => {
         </p>
 
         {/* Product Table */}
-        <div className="w-full max-w-6xl bg-white shadow-md rounded-lg overflow-hidden">
+        <div className="w-full max-w-6xl bg-white shadow-md rounded-lg overflow-hidden mx-auto">
           <table className="w-full table-fixed">
             <thead className="bg-gray-100">
               <tr>
@@ -90,24 +112,24 @@ const ProductsPage: React.FC = () => {
         <div className="mt-8 text-center">
           <button
             className="bg-purple-700 text-white px-6 py-3 rounded-md hover:bg-purple-800 transition duration-300"
-            onClick={() => window.location.href = "/upload-course"}
+            onClick={() => (window.location.href = "/upload-course")}
           >
             Add New Product
           </button>
         </div>
 
         {/* Footer */}
-        <footer className="mt-12 text-center w-full max-w-xl">
+        <footer className="mt-12 text-center w-full max-w-xl mx-auto">
           <p className="text-gray-500">
             For Support: Send a mail to{" "}
             <a
               href="mailto:help@promptearn.com"
               className="text-blue-600 hover:underline"
             >
-              help@promptearn.com
+              help@profitplus.com
             </a>
           </p>
-          <p className="text-gray-500 mt-2">&copy; 2024, PromptEarn</p>
+          <p className="text-gray-500 mt-2">&copy; 2024, ProfitPlus</p>
         </footer>
       </div>
     </div>
