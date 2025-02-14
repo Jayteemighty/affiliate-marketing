@@ -28,6 +28,7 @@ const ProfilePage: React.FC = () => {
   });
 
   const [isUpdating, setIsUpdating] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   // Handle form input changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -57,17 +58,26 @@ const ProfilePage: React.FC = () => {
       const data = await response.json();
       alert(data.message || "Profile updated successfully!");
     } catch (error) {
-      console.error("Error updating profile:", error.message);
-      alert("An error occurred while updating your profile. Please try again.");
+      if (error instanceof Error) {
+        console.error("Error updating profile:", error.message);
+        alert("An error occurred while updating your profile. Please try again.");
+      } else {
+        console.error("An unknown error occurred:", error);
+        alert("An unknown error occurred. Please try again.");
+      }
     } finally {
       setIsUpdating(false);
     }
   };
 
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
+
   return (
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
-      <Sidebar />
+      <Sidebar isOpen={isSidebarOpen} onClose={toggleSidebar} />
 
       {/* Main Content Area */}
       <div className="flex-grow flex flex-col items-center justify-center p-4 md:p-8">
