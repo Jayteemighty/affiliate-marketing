@@ -38,57 +38,147 @@ const DashboardPage: React.FC = () => {
 
         <h1 className="text-2xl md:text-3xl font-bold mb-4">Welcome to Your Dashboard</h1>
         <p className="text-base md:text-lg text-gray-600 mb-8">
-          Here, you can manage your products, check transaction status, and view
-          earnings.
+          Here, you can manage your products, check transaction status, and view earnings.
         </p>
 
-        {/* Today's Sales Summary */}
+        {/* Earnings and Sales Summary */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-          {/* Today's Sale Card */}
+          {/* Overall Affiliate Earnings Card */}
           <div className="bg-white shadow-md rounded-lg p-4">
-            <h2 className="text-lg md:text-xl font-semibold mb-2">Today's Sale</h2>
-            <p className="text-2xl md:text-3xl font-bold">$0</p>
+            <div className="flex items-center mb-2">
+              <div className="p-2 bg-green-200 rounded-full">
+                <i className="material-icons text-green-600">$</i>
+              </div>
+              <div className="ml-2">
+                <h2 className="text-lg md:text-xl font-semibold">Overall Affiliate Earnings</h2>
+                <p className="text-2xl md:text-3xl font-bold">
+                  <span>$</span><span>0</span>
+                </p>
+              </div>
+            </div>
+            <div className="text-gray-600">Current Earnings</div>
           </div>
 
-          {/* Affiliate Earnings Card */}
+          {/* Overall Vendor Earnings Card */}
           <div className="bg-white shadow-md rounded-lg p-4">
-            <h2 className="text-lg md:text-xl font-semibold mb-2">Today's Affiliate Earnings</h2>
-            <p className="text-2xl md:text-3xl font-bold">$0</p>
+            <div className="flex items-center mb-2">
+              <div className="p-2 bg-green-200 rounded-full">
+                <i className="material-icons text-green-600">$</i>
+              </div>
+              <div className="ml-2">
+                <h2 className="text-lg md:text-xl font-semibold">Overall Vendor Earnings</h2>
+                <p className="text-2xl md:text-3xl font-bold">
+                  <span>$</span><span>0</span>
+                </p>
+              </div>
+            </div>
+            <div className="text-gray-600">Current Earnings</div>
           </div>
 
-          {/* Vendor Earnings Card */}
+          {/* Overall Sales Card */}
           <div className="bg-white shadow-md rounded-lg p-4">
-            <h2 className="text-lg md:text-xl font-semibold mb-2">Today's Vendor Earnings</h2>
-            <p className="text-2xl md:text-3xl font-bold">$0</p>
+            <div className="flex items-center mb-2">
+              <div className="p-2 bg-green-200 rounded-full">
+                <i className="material-icons text-green-600">store</i>
+              </div>
+              <div className="ml-2">
+                <h2 className="text-lg md:text-xl font-semibold">Overall Sales</h2>
+                <p className="text-2xl md:text-3xl font-bold">0</p>
+              </div>
+            </div>
+            <div className="text-gray-600">Total</div>
           </div>
-        </div>
 
-        {/* Withdrawals Section */}
-        <section className="mt-8">
-          <h2 className="text-xl md:text-2xl font-bold mb-4">Withdrawals</h2>
-          <div className="bg-white shadow-md rounded-lg p-4 md:p-6">
-            <p className="text-gray-600 mb-4">
-              Withdrawals are only available on Saturdays.
-            </p>
-            <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-2">
-              <label htmlFor="withdrawalAmount" className="font-medium">
-                Type Amount:
-              </label>
+          {/* Available Affiliate Earnings Card */}
+          <div className="bg-white shadow-md rounded-lg p-4">
+            <div className="flex items-center mb-2">
+              <div className="p-2 bg-green-200 rounded-full">
+                <i className="material-icons text-green-600">$</i>
+              </div>
+              <div className="ml-2">
+                <h2 className="text-lg md:text-xl font-semibold">Available Affiliate Earnings</h2>
+                <p className="text-2xl md:text-3xl font-bold">
+                  <span>$</span><span>0</span>
+                </p>
+              </div>
+            </div>
+            <div className="text-gray-600">Withdrawals only available on Saturdays</div>
+            <form className="mt-4">
+              <label className="block text-gray-700 font-medium mb-2">Type Amount:</label>
               <input
                 type="number"
-                id="withdrawalAmount"
-                placeholder="Enter amount in dollars"
-                className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-200 flex-grow w-full md:w-auto"
+                step="0.01"
+                name="amount"
+                min="1"
+                placeholder="Type Amount Here"
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-200"
               />
-              <button
-                className="bg-blue-700 text-white px-4 py-2 rounded-md hover:bg-blue-800 transition duration-300 w-full md:w-auto"
-                disabled
-              >
+              <p className="text-red-500 text-sm">Please ensure you type the amount you want to withdraw in <b>dollar</b></p>
+              <button type="submit" className="mt-2 bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition duration-300">
                 Withdraw
               </button>
+            </form>
+          </div>
+
+          {/* Available Vendor Earnings Card */}
+          <div className="bg-white shadow-md rounded-lg p-4">
+            <div className="flex items-center mb-2">
+              <div className="p-2 bg-green-200 rounded-full">
+                <i className="material-icons text-green-600">$</i>
+              </div>
+              <div className="ml-2">
+                <h2 className="text-lg md:text-xl font-semibold">Available Vendor Earnings</h2>
+                <p className="text-2xl md:text-3xl font-bold">
+                  <span>$</span><span>0</span>
+                </p>
+              </div>
+            </div>
+            <div className="text-gray-600">Withdrawals only available on Saturdays</div>
+            <form className="mt-4">
+              <label className="block text-gray-700 font-medium mb-2">Type Amount:</label>
+              <input
+                type="number"
+                step="0.01"
+                name="amount"
+                min="1"
+                placeholder="Type Amount Here"
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-200"
+              />
+              <p className="text-red-500 text-sm">Please ensure you type the amount you want to withdraw in <b>dollar</b></p>
+              <button type="submit" className="mt-2 bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition duration-300">
+                Withdraw
+              </button>
+            </form>
+          </div>
+
+          {/* My Products Card */}
+          <div className="bg-white shadow-md rounded-lg p-4">
+            <div className="flex items-center mb-2">
+              <div className="p-2 bg-green-200 rounded-full">
+                <i className="material-icons text-green-600">list</i>
+              </div>
+              <div className="ml-2">
+                <h2 className="text-lg md:text-xl font-semibold">My Products</h2>
+                <p className="text-2xl md:text-3xl font-bold">0</p>
+              </div>
             </div>
           </div>
-        </section>
+
+          {/* Total Withdrawals Card */}
+          <div className="bg-white shadow-md rounded-lg p-4">
+            <div className="flex items-center mb-2">
+              <div className="p-2 bg-green-200 rounded-full">
+                <i className="material-icons text-green-600">$</i>
+              </div>
+              <div className="ml-2">
+                <h2 className="text-lg md:text-xl font-semibold">Total Withdrawals</h2>
+                <p className="text-2xl md:text-3xl font-bold">
+                  <span>$</span><span>0</span>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
