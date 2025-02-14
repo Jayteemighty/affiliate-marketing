@@ -1,11 +1,17 @@
-import React from "react";
+import React, { useState } from "react";
 import Sidebar from "../../components/Sidebar";
 
 const BecomeVendorPage: React.FC = () => {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+        
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
+
   return (
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
-      <Sidebar />
+      <Sidebar isOpen={isSidebarOpen} onClose={toggleSidebar} />
 
       {/* Main Content Area */}
       <div className="flex-grow flex flex-col items-center justify-center p-4 md:p-8">
