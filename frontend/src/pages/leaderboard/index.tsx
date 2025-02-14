@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Sidebar from "../../components/Sidebar";
 
 interface LeaderboardItem {
@@ -17,10 +17,17 @@ const leaderboardData: LeaderboardItem[] = [
 ];
 
 const LeaderboardPage: React.FC = () => {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
+
   return (
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
-      <Sidebar />
+      <Sidebar isOpen={isSidebarOpen} onClose={toggleSidebar} />
+
 
       {/* Main Content Area */}
       <div className="flex-grow flex flex-col items-center justify-center p-4 md:p-8">
@@ -65,14 +72,14 @@ const LeaderboardPage: React.FC = () => {
           <p className="text-gray-600">
             Click{" "}
             <a
-              href="https://twitter.com/promptearn"
+              href="https://twitter.com/profitplus"
               target="_blank"
               rel="noopener noreferrer"
               className="text-blue-600 hover:underline"
             >
               here
             </a>{" "}
-            to follow PromptEarn on Twitter and stay updated.
+            to follow ProfitPlus on Twitter and stay updated.
           </p>
         </div>
 
@@ -84,10 +91,10 @@ const LeaderboardPage: React.FC = () => {
               href="mailto:help@promptearn.com"
               className="text-blue-600 hover:underline"
             >
-              help@promptearn.com
+              help@ProfitPlus.com
             </a>
           </p>
-          <p className="text-gray-500 mt-2">&copy; 2024, PromptEarn</p>
+          <p className="text-gray-500 mt-2">&copy; 2024, ProfitPlus</p>
         </footer>
       </div>
     </div>

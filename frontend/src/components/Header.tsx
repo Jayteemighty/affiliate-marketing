@@ -18,7 +18,7 @@ const Header: React.FC = () => {
             <img
               src={logo}
               alt="ProfitPlus"
-              className="h-20 w-auto hover:opacity-80 transition-opacity duration-300"
+              className="h-15 w-auto hover:opacity-80 transition-opacity duration-300"
             />
           </NavLink>
         </nav>

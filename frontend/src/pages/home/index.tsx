@@ -1,5 +1,6 @@
 import React from "react";
 import DefaultLayout from "../../layouts/DefaultLayout";
+import { NavLink } from "react-router-dom";
 
 const HomePage: React.FC = () => {
   return (
@@ -16,8 +17,10 @@ const HomePage: React.FC = () => {
             Implementing What You Learn, Overcoming Obstacles, and Embracing a
             Growth Mindset.
           </p>
-          <button className="mt-8 bg-white text-blue-700 px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition duration-300">
+          <button className="mt-8 bg-white text-purple-800 px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition duration-300">
+            <NavLink to="/register">
             Get Started
+            </NavLink>
           </button>
         </section>
 
