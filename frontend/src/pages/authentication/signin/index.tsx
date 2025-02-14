@@ -39,8 +39,13 @@ const LoginPage: React.FC = () => {
         window.location.href = "/dashboard"; // Redirect to dashboard or another page
       }, 2000);
     } catch (error) {
-      console.error("Error:", error.message);
-      alert(`An error occurred: ${error.message}`);
+      if (error instanceof Error) {
+        console.error("Error:", error.message);
+        alert(`An error occurred: ${error.message}`);
+      } else {
+        console.error("An unknown error occurred:", error);
+        alert("An unknown error occurred. Please try again.");
+      }
     }
   };
 
