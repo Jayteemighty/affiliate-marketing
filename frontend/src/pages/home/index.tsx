@@ -122,7 +122,7 @@ const HomePage: React.FC = () => {
             Join Our Affiliate Program and Start Earning Today!
           </h2>
           <button className="bg-white text-blue-700 px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition duration-300">
-            Sign Up Now
+            <NavLink to="/register">Sign Up Now</NavLink>
           </button>
         </section>
       </div>
