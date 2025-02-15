@@ -9,27 +9,27 @@ const Footer: React.FC = () => {
           <h3 className="text-lg font-semibold mb-2">Company</h3>
           <ul>
             <li>
-              <a href="#about-us" className="hover:underline block mb-1">
+              <a href="/about-us" className="hover:underline block mb-1">
                 About Us
               </a>
             </li>
             <li>
-              <a href="#affiliates" className="hover:underline block mb-1">
+              <a href="/affiliates" className="hover:underline block mb-1">
                 Affiliates
               </a>
             </li>
             <li>
-              <a href="#vendors" className="hover:underline block mb-1">
+              <a href="/vendors" className="hover:underline block mb-1">
                 Vendors
               </a>
             </li>
             <li>
-              <a href="#blog" className="hover:underline block mb-1">
+              <a href="/blog" className="hover:underline block mb-1">
                 Blog
               </a>
             </li>
             <li>
-              <a href="#faq" className="hover:underline block mb-1">
+              <a href="/faq" className="hover:underline block mb-1">
                 FAQ
               </a>
             </li>
@@ -41,17 +41,17 @@ const Footer: React.FC = () => {
           <h3 className="text-lg font-semibold mb-2">Resources</h3>
           <ul>
             <li>
-              <a href="#terms" className="hover:underline block mb-1">
+              <a href="/terms" className="hover:underline block mb-1">
                 Terms and Conditions
               </a>
             </li>
             <li>
-              <a href="#disclaimer" className="hover:underline block mb-1">
+              <a href="/disclaimer" className="hover:underline block mb-1">
                 Disclaimer
               </a>
             </li>
             <li>
-              <a href="#refund" className="hover:underline block mb-1">
+              <a href="/refund" className="hover:underline block mb-1">
                 Refund Policy
               </a>
             </li>
@@ -63,18 +63,23 @@ const Footer: React.FC = () => {
           <h3 className="text-lg font-semibold mb-2">Social Links</h3>
           <ul>
             <li>
-              <a href="#twitter" className="hover:underline block mb-1">
+              <a href="https://twitter.com/promptearn" className="hover:underline block mb-1">
                 Twitter
               </a>
             </li>
             <li>
-              <a href="#facebook" className="hover:underline block mb-1">
+              <a href="https://www.facebook.com/profile.php?id=100091985422824" className="hover:underline block mb-1">
                 Facebook
               </a>
             </li>
             <li>
-              <a href="#instagram" className="hover:underline block mb-1">
+              <a href="https://www.instagram.com/promptearn/" className="hover:underline block mb-1">
                 Instagram
+              </a>
+            </li>
+            <li>
+              <a href="mailto:help@promptearn.com" className="hover:underline block mb-1">
+                Email
               </a>
             </li>
           </ul>
@@ -83,7 +88,7 @@ const Footer: React.FC = () => {
 
       {/* Copyright */}
       <div className="text-center mt-8">
-        <p>Copyright © 2023 Profit Plus</p>
+        <p>Copyright © {new Date().getFullYear()} Profit Plus</p>
       </div>
     </footer>
   );
