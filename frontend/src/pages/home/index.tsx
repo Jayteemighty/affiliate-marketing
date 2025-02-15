@@ -3,10 +3,8 @@ import DefaultLayout from "../../layouts/DefaultLayout";
 import { NavLink } from "react-router-dom";
 import heroImage from "../../assets/Frame004317.png";
 import featuredImage from "../../assets/Frame34000004410.png";
-// import testimonialImage1 from "../../assets/Frame34f1000004512.png";
-// import testimonialImage2 from "../../assets/Mask4group3.png";
-// import logo from "../../assets/result (3).png";
-// import Footer from "../../components/Footer";
+import FAQSection from "../../components/FAQSection";
+
 
 const HomePage: React.FC = () => {
   return (
@@ -24,7 +22,7 @@ const HomePage: React.FC = () => {
               Implementing What You Learn, Overcoming Obstacles, and Embracing a
               Growth Mindset.
             </p>
-            <button className="mt-8 bg-purple-800 text-white px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition duration-300">
+            <button className="mt-8 bg-purple-800 text-white px-8 py-3 rounded-full font-semibold hover:bg-green-500 transition duration-300">
               <NavLink to="/register">
                 Get Started
               </NavLink>
@@ -46,9 +44,9 @@ const HomePage: React.FC = () => {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Feature 1 */}
-            <div className="bg-white shadow-lg rounded-lg p-6 hover:shadow-xl transition-shadow duration-300">
+            <div className="bg-white shadow-lg rounded-lg p-6 hover:scale-105 hover:shadow-2xl transition-shadow duration-300">
               <div className="text-blue-600 text-4xl mb-4">💰</div>
-              <h3 className="text-2xl font-semibold text-gray-800 mb-2">
+              <h3 className="text-2xl font-semibold text-purple-800 mb-2">
                 Quick & Secure Payments
               </h3>
               <p className="text-gray-600">
@@ -58,9 +56,9 @@ const HomePage: React.FC = () => {
             </div>
 
             {/* Feature 2 */}
-            <div className="bg-white shadow-lg rounded-lg p-6 hover:shadow-xl transition-shadow duration-300">
+            <div className="bg-white shadow-lg rounded-lg p-6 hover:scale-105 hover:shadow-2xl transition-shadow duration-300">
               <div className="text-purple-600 text-4xl mb-4">📈</div>
-              <h3 className="text-2xl font-semibold text-gray-800 mb-2">
+              <h3 className="text-2xl font-semibold text-purple-800 mb-2">
                 Generous Commission Structure
               </h3>
               <p className="text-gray-600">
@@ -70,9 +68,9 @@ const HomePage: React.FC = () => {
             </div>
 
             {/* Feature 3 */}
-            <div className="bg-white shadow-lg rounded-lg p-6 hover:shadow-xl transition-shadow duration-300">
+            <div className="bg-white shadow-lg rounded-lg p-6 hover:scale-105 hover:shadow-2xl transition-shadow duration-300">
               <div className="text-green-600 text-4xl mb-4">🌐</div>
-              <h3 className="text-2xl font-semibold text-gray-800 mb-2">
+              <h3 className="text-2xl font-semibold text-purple-800 mb-2">
                 Extensive Affiliate Network
               </h3>
               <p className="text-gray-600">
@@ -91,12 +89,13 @@ const HomePage: React.FC = () => {
               alt="Featured Image"
               className="w-full md:w-1/2 rounded-lg shadow-lg"
             />
-            <div className="bg-white p-6 rounded-lg shadow-lg md:w-1/2">
-              <h5 className="text-xl font-semibold text-gray-800 mb-4">
+            <div className="bg-white p-6 rounded-lg shadow-lg md:w-1/2 hover:scale-105 hover:shadow-2xl transition-shadow duration-300">
+            <div className="text-blue-600 text-4xl mb-4">💰</div>
+              <h5 className="text-2xl font-semibold text-purple-800 mb-4">
                 Increase your income by promoting high-quality products from
                 reliable vendors.
               </h5>
-              <p className="text-gray-600 mb-4">
+              <p className="text-gray-600 mb-20">
                 Sign up as a ProfitPlus affiliate and gain immediate access to
                 our product marketplace. Choose any product that interests you
                 and start promoting it right away. Additionally, you'll receive
@@ -105,7 +104,7 @@ const HomePage: React.FC = () => {
               </p>
               <NavLink
                 to="/register"
-                className="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition duration-300"
+                className="bg-purple-800 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition duration-300"
               >
                 Become an Affiliate
               </NavLink>
@@ -114,118 +113,7 @@ const HomePage: React.FC = () => {
         </section>
 
         {/* FAQ Section */}
-        <section className="mt-12">
-          <h2 className="text-3xl font-bold text-center mb-8 text-gray-900">
-            Frequently Asked Questions
-          </h2>
-          <div className="faq-container mx-auto">
-            <div className="faq-item bg-gray-100 p-6 rounded-lg shadow-md mb-4 hover:shadow-lg transition-shadow duration-300">
-              <div className="faq-question flex justify-between items-center cursor-pointer">
-                <h3 className="text-lg font-semibold text-gray-800">
-                  What is Profit Plus about?
-                </h3>
-                <span className="icon text-xl font-bold">+</span>
-              </div>
-              <div className="faq-answer text-gray-600 mt-4 max-h-0 overflow-hidden transition-max-height duration-300 ease-in-out">
-                <p>
-                  Profit Plus is a digital marketplace that facilitates the sale
-                  of high-value digital and physical products. It connects
-                  skilled affiliates—marketers who promote and recommend
-                  products—with vendors who create these products. The platform
-                  offers a reliable payment system, high commission rates (up
-                  to 75% per sale), a curated product marketplace, regular
-                  training for affiliates, and strong support to ensure a
-                  seamless experience.
-                </p>
-              </div>
-            </div>
-            <div className="faq-item bg-gray-100 p-6 rounded-lg shadow-md mb-4 hover:shadow-lg transition-shadow duration-300">
-              <div className="faq-question flex justify-between items-center cursor-pointer">
-                <h3 className="text-lg font-semibold text-gray-800">
-                  How do I make sales?
-                </h3>
-                <span className="icon text-xl font-bold">+</span>
-              </div>
-              <div className="faq-answer text-gray-600 mt-4 max-h-0 overflow-hidden transition-max-height duration-300 ease-in-out">
-                <p>
-                  To make sales on Profit Plus, you can register as an affiliate,
-                  gain access to the product marketplace, and select products to
-                  promote. By sharing your unique affiliate links and effectively
-                  marketing the products, you earn commissions on each sale made
-                  through your link. The platform provides regular training to
-                  enhance your sales and marketing skills, helping you maximize
-                  your earnings.
-                </p>
-              </div>
-            </div>
-            <div className="faq-item bg-gray-100 p-6 rounded-lg shadow-md mb-4 hover:shadow-lg transition-shadow duration-300">
-              <div className="faq-question flex justify-between items-center cursor-pointer">
-                <h3 className="text-lg font-semibold text-gray-800">
-                  What is the ABIC course about?
-                </h3>
-                <span className="icon text-xl font-bold">+</span>
-              </div>
-              <div className="faq-answer text-gray-600 mt-4 max-h-0 overflow-hidden transition-max-height duration-300 ease-in-out">
-                <p>
-                  The ABIC course teaches affiliate marketing, forex, 3D
-                  animations, and monetization. It shows how to leverage
-                  affiliate marketing to fund your forex account, take trades
-                  based on strategies you learn, and get started with creating
-                  and monetizing 3D animations. These skills can help you say
-                  goodbye to financial struggles for good!
-                </p>
-              </div>
-            </div>
-            <div className="faq-item bg-gray-100 p-6 rounded-lg shadow-md mb-4 hover:shadow-lg transition-shadow duration-300">
-              <div className="faq-question flex justify-between items-center cursor-pointer">
-                <h3 className="text-lg font-semibold text-gray-800">
-                  How do I get paid on Profit Plus?
-                </h3>
-                <span className="icon text-xl font-bold">+</span>
-              </div>
-              <div className="faq-answer text-gray-600 mt-4 max-h-0 overflow-hidden transition-max-height duration-300 ease-in-out">
-                <p>
-                  Profit Plus has a solid payment system that ensures you receive
-                  payments for every sale made through your affiliate links.
-                  Earnings are paid out weekly, with withdrawals processed on
-                  Sundays, allowing you to receive your money in your preferred
-                  bank account. The platform supports earnings in multiple
-                  currencies and offers favorable exchange rates for local bank
-                  deposits.
-                </p>
-              </div>
-            </div>
-            <div className="faq-item bg-gray-100 p-6 rounded-lg shadow-md mb-4 hover:shadow-lg transition-shadow duration-300">
-              <div className="faq-question flex justify-between items-center cursor-pointer">
-                <h3 className="text-lg font-semibold text-gray-800">
-                  Can I sell my course on Profit Plus?
-                </h3>
-                <span className="icon text-xl font-bold">+</span>
-              </div>
-              <div className="faq-answer text-gray-600 mt-4 max-h-0 overflow-hidden transition-max-height duration-300 ease-in-out">
-                <p>
-                  On our website, vendors can upload and sell unlimited courses,
-                  with the flexibility to withdraw earnings every Sunday directly
-                  from their course dashboard.
-                </p>
-              </div>
-            </div>
-            <div className="faq-item bg-gray-100 p-6 rounded-lg shadow-md mb-4 hover:shadow-lg transition-shadow duration-300">
-              <div className="faq-question flex justify-between items-center cursor-pointer">
-                <h3 className="text-lg font-semibold text-gray-800">
-                  Where can I find answers to more questions?
-                </h3>
-                <span className="icon text-xl font-bold">+</span>
-              </div>
-              <div className="faq-answer text-gray-600 mt-4 max-h-0 overflow-hidden transition-max-height duration-300 ease-in-out">
-                <p>
-                  You can find more answers on the Profit Plus platform. Visit
-                  theprofitplus.com.ng for additional details and updates.
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
+        <FAQSection />
 
         {/* Testimonials Section */}
         <section className="mt-12">

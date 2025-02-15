@@ -4,3 +4,7 @@
 @tailwind components;
 @tailwind utilities;
 
+.text-green-custom {
+    color: "#4CAF50";
+  }
+  
