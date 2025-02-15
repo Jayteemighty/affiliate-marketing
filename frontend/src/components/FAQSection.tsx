@@ -49,7 +49,7 @@ const FAQSection: React.FC = () => {
         {faqData.map((faq, index) => (
           <div
             key={index}
-            className={`faq-item bg-gray-100 p-6 rounded-lg shadow-md mb-4 hover:shadow-lg transition-shadow duration-300 ${
+            className={`faq-item bg-gray-100 p-6 rounded-lg shadow-md mb-4 hover:scale-105 hover:shadow-lg transition-shadow duration-300 ${
               activeIndex === index ? "active" : ""
             }`}
           >
@@ -57,7 +57,7 @@ const FAQSection: React.FC = () => {
               className="faq-question flex justify-between items-center cursor-pointer"
               onClick={() => toggleFAQ(index)}
             >
-              <h3 className="text-lg font-semibold text-gray-800">
+              <h3 className="text-lg font-semibold text-gray-800 hover:text-green-600 duration-300">
                 {faq.question}
               </h3>
               <span className="icon text-xl font-bold">
