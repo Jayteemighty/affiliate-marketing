@@ -36,7 +36,7 @@ const FAQSection: React.FC = () => {
     {
       question: "Where can I find answers to more questions?",
       answer:
-        "You can find more answers on the Profit Plus platform. Visit theprofitplus.com.ng for additional details and updates.",
+        "You can find more answers on the Profit Plus platform. Visit theprofitplus.com.ng/faq for additional details and updates.",
     },
   ];
 
