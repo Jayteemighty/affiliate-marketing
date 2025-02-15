@@ -4,6 +4,7 @@ import { NavLink } from "react-router-dom";
 import heroImage from "../../assets/Frame004317.png";
 import featuredImage from "../../assets/Frame34000004410.png";
 import FAQSection from "../../components/FAQSection";
+import TestimonialsSection from "../../components/TestimonialsSection";
 
 
 const HomePage: React.FC = () => {
@@ -116,89 +117,7 @@ const HomePage: React.FC = () => {
         <FAQSection />
 
         {/* Testimonials Section */}
-        <section className="mt-12">
-          <h2 className="text-3xl font-bold text-center mb-8 text-gray-900">
-            What Our Users Are Saying
-          </h2>
-          <div className="carousel">
-            <div className="carousel-track" id="carouselTrack">
-              <div className="testimonial-item bg-white p-6 rounded-lg shadow-lg">
-                <div className="testimonial-avatar bg-gray-200 text-gray-800 flex items-center justify-center text-lg font-bold">
-                  OM
-                </div>
-                <div className="testimonial-content">
-                  <h3 className="text-lg font-semibold text-gray-800">
-                    Oyebamiji Maryam
-                  </h3>
-                  <p className="text-gray-600">
-                    "Profit Plus transformed my life! Within two months, I earned
-                    enough to pay for my school fees and even started my own
-                    small business."
-                  </p>
-                </div>
-              </div>
-              <div className="testimonial-item bg-white p-6 rounded-lg shadow-lg">
-                <div className="testimonial-avatar bg-gray-200 text-gray-800 flex items-center justify-center text-lg font-bold">
-                  SN
-                </div>
-                <div className="testimonial-content">
-                  <h3 className="text-lg font-semibold text-gray-800">
-                    Shittu Nimotallahi
-                  </h3>
-                  <p className="text-gray-600">
-                    "Joining Profit Plus was the best decision I ever made. The
-                    ABIC course equipped me with skills in affiliate marketing and
-                    forex trading."
-                  </p>
-                </div>
-              </div>
-              <div className="testimonial-item bg-white p-6 rounded-lg shadow-lg">
-                <div className="testimonial-avatar bg-gray-200 text-gray-800 flex items-center justify-center text-lg font-bold">
-                  QA
-                </div>
-                <div className="testimonial-content">
-                  <h3 className="text-lg font-semibold text-gray-800">
-                    Qazeem Aisha
-                  </h3>
-                  <p className="text-gray-600">
-                    "I was skeptical at first, but Profit Plus proved me wrong. I
-                    learned 3D animation and started making money creating content
-                    for brands."
-                  </p>
-                </div>
-              </div>
-              <div className="testimonial-item bg-white p-6 rounded-lg shadow-lg">
-                <div className="testimonial-avatar bg-gray-200 text-gray-800 flex items-center justify-center text-lg font-bold">
-                  IA
-                </div>
-                <div className="testimonial-content">
-                  <h3 className="text-lg font-semibold text-gray-800">
-                    Ibrahim Awwal
-                  </h3>
-                  <p className="text-gray-600">
-                    "Profit Plus gave me the tools and confidence to succeed. The
-                    weekly payouts are reliable, and the community is incredibly
-                    supportive."
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div className="button-container text-center mt-4">
-              <button
-                className="carousel-btn bg-black text-white px-4 py-2 rounded hover:bg-gray-800 transition duration-300"
-                id="prevBtn"
-              >
-                Previous
-              </button>
-              <button
-                className="carousel-btn bg-black text-white px-4 py-2 rounded hover:bg-gray-800 transition duration-300"
-                id="nextBtn"
-              >
-                Next
-              </button>
-            </div>
-          </div>
-        </section>
+        <TestimonialsSection />
 
         {/* Call to Action */}
         <section className="mt-12 text-center bg-gradient-to-r bg-gray-800 py-16 rounded-lg shadow-lg">
