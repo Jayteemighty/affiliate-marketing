@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import DefaultLayout from "../../../layouts/DefaultLayout";
+import logo from "../../../assets/result (3).png";
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -56,11 +57,11 @@ const LoginPage: React.FC = () => {
         <div className="hidden lg:block w-1/2 bg-gray-900 text-white flex items-center justify-center">
           <div className="space-y-8">
             <img
-              src="/result(3).png" // Replace with your logo path
+              src={logo} // Replace with your logo path
               alt="PromptEarn"
               className="w-64 mb-8"
             />
-            <p className="text-2xl font-bold max-w-md">
+            <p className="text-2xl font-bold max-w-md p-8">
               It only takes a few seconds to log into your account.
             </p>
           </div>
@@ -115,7 +116,7 @@ const LoginPage: React.FC = () => {
             {/* Login Button */}
             <button
               type="submit"
-              className="w-full bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition duration-300"
+              className="w-full bg-purple-800 text-white px-4 py-2 rounded-md hover:bg-green-600 transition duration-300"
             >
               Login
             </button>
@@ -135,7 +136,7 @@ const LoginPage: React.FC = () => {
               <span className="text-sm text-gray-600">
                 Don't have an account?{" "}
                 <a
-                  href="/sign-up"
+                  href="/register"
                   className="text-blue-600 hover:underline"
                 >
                   Sign Up

@@ -111,7 +111,7 @@ const SignUpPage: React.FC = () => {
           {/* Create Account Button */}
           <button
             type="submit"
-            className="w-full bg-blue-700 text-white px-4 py-2 rounded-md hover:bg-blue-800 transition duration-300"
+            className="w-full bg-purple-800 text-white px-4 py-2 rounded-md hover:bg-blue-800 transition duration-300"
           >
             Create Account
           </button>
