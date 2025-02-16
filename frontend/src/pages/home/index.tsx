@@ -5,6 +5,9 @@ import heroImage from "../../assets/Frame004317.png";
 import featuredImage from "../../assets/Frame34000004410.png";
 import FAQSection from "../../components/FAQSection";
 import TestimonialsSection from "../../components/TestimonialsSection";
+import frameImage from "../../assets/Frame34f1000004512.png";
+import HowItWorksSection from "../../components/HowItWorksSection";
+import maskImage from "../../assets/Mask4group3.png";
 
 
 const HomePage: React.FC = () => {
@@ -121,13 +124,125 @@ const HomePage: React.FC = () => {
 
         {/* Call to Action */}
         <section className="mt-12 text-center bg-gradient-to-r bg-gray-800 py-16 rounded-lg shadow-lg">
-          <h2 className="text-3xl font-bold text-white mb-6">
+          <h2 className="text-3xl font-bold text-purple-800 mb-6">
             Join Our Affiliate Program and Start Earning Today!
           </h2>
+          <p className="text-white mb-4">
+            Signing up is simple and fast. Share your unique referral link and start earning right away.
+          </p>
           <button className="bg-white text-blue-700 px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition duration-300">
             <NavLink to="/register">Sign Up Now</NavLink>
           </button>
         </section>
+
+          {/* Vendor Partnership Section */}
+        <section className="container mx-auto px-4 py-12">
+          <div className="flex flex-col md:flex-row items-center gap-8">
+            {/* Text Content */}
+            <div className="flex-1">
+              <h2 className="text-[#05212f] font-raleway font-bold text-2xl mb-4">
+                Have a product or course that deserves more sales?
+              </h2>
+              <h3 className="text-purple-800 leading-8 font-bold font-raleway text-xl mb-6">
+                Partner with us to reach a wider audience and boost sales! Our platform connects you with experienced affiliates who can promote your products worldwide.
+              </h3>
+              <p className="font-raleway text-gray-700 mb-6">
+                We'll help you sell your course to a targeted audience, handling marketing and promotion so you can focus on creating great content. <br />
+                Our team is dedicated to supporting you every step of the way, ensuring your success in the online marketplace. <br />
+                Add an extra layer of credibility to your course with our optional exam and certificate feature (one-time payment of 30,000 NGN). This feature allows you to create assessments and provide official certificates to students upon completion, enhancing their learning experience and your course's value.
+              </p>
+              <a
+                href="/vendor"
+                className="inline-block bg-purple-800 text-white px-6 py-3 rounded-lg font-bold text-lg hover:bg-[#52b998] transition duration-300"
+              >
+                Become a ProfitPlus Vendor
+              </a>
+            </div>
+
+            {/* Image */}
+            <div className="flex-1">
+              <img
+                src={frameImage}
+                alt="Promotional Banner"
+                className="w-full max-w-[500px] rounded-lg shadow-lg"
+              />
+            </div>
+          </div>
+        </section>
+
+        <HowItWorksSection />
+
+        {/* Featured Posts Section */}
+        <section className="featured-posts py-12">
+          <div className="container mx-auto px-4">
+            <div className="main-content">
+              <div className="row listfeaturedtag">
+                <div className="col-sm-12">
+                  <div className="card">
+                    <div
+                      className="flex flex-col md:flex-row bg-[#f3f9ea] p-0"
+                      style={{ backgroundColor: "#f3f9ea", padding: "0px" }}
+                    >
+                      {/* Text Content */}
+                      <div className="flex-1 p-6">
+                        <h2
+                          className="text-[#05212f] leading-[50px] font-raleway font-bold text-3xl md:text-4xl"
+                          style={{
+                            color: "#05212f",
+                            lineHeight: "50px",
+                            fontFamily: "Raleway",
+                            fontWeight: "bold",
+                          }}
+                        >
+                          Ready to make more money promoting quality products to
+                          an international audience?
+                        </h2>
+                        <br />
+                        <p className="font-raleway text-gray-700">
+                          Create your PromptEarn account in less than 5 minutes
+                          and start earning
+                        </p>
+                        <br />
+                        <div className="flex flex-col md:flex-row gap-4">
+                          <a
+                            id="btn11xx"
+                            href="/register"
+                            className="bg-purple-800 text-white px-6 py-3 rounded-lg font-bold text-lg hover:bg-[#218838] transition duration-300"
+                          >
+                            Create account
+                          </a>
+                          <a
+                            id="btn22xx"
+                            href="#"
+                            className="bg-purple-800 text-white px-6 py-3 rounded-lg font-bold text-lg hover:bg-[#218838] transition duration-300"
+                          >
+                            Watch live demo first
+                          </a>
+                        </div>
+                      </div>
+
+                      {/* Image */}
+                      <div className="flex-1">
+                        <img
+                          src={maskImage} // Use the imported image
+                          alt="Promotional Banner"
+                          className="w-full max-w-[500px] rounded-lg shadow-lg"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+
+        
+
+      {/* Spacer Div */}
+      <div id="befor33" className="mt-24 md:mt-0"></div>
+    
       </div>
     </DefaultLayout>
   );

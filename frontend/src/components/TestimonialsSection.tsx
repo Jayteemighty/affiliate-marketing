@@ -77,14 +77,14 @@ const TestimonialsSection: React.FC = () => {
           </div>
           <div className="button-container text-center mt-4">
             <button
-              className="carousel-btn bg-black text-white px-4 py-2 rounded hover:bg-gray-800 transition duration-300 mr-2"
+              className="carousel-btn bg-purple-800 text-white px-4 py-2 rounded hover:bg-gray-800 transition duration-300 mr-2"
               onClick={handlePrev}
               disabled={currentIndex === 0}
             >
               Previous
             </button>
             <button
-              className="carousel-btn bg-black text-white px-4 py-2 rounded hover:bg-gray-800 transition duration-300"
+              className="carousel-btn bg-purple-800 text-white px-4 py-2 rounded hover:bg-gray-800 transition duration-300"
               onClick={handleNext}
               disabled={currentIndex === testimonials.length - 1}
             >

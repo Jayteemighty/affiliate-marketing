@@ -9,17 +9,17 @@ const Footer: React.FC = () => {
           <h3 className="text-lg font-semibold mb-2">Company</h3>
           <ul>
             <li>
-              <a href="/about-us" className="hover:underline block mb-1">
+              <a href="/about" className="hover:underline block mb-1">
                 About Us
               </a>
             </li>
             <li>
-              <a href="/affiliates" className="hover:underline block mb-1">
+              <a href="/affiliate" className="hover:underline block mb-1">
                 Affiliates
               </a>
             </li>
             <li>
-              <a href="/vendors" className="hover:underline block mb-1">
+              <a href="/vendor" className="hover:underline block mb-1">
                 Vendors
               </a>
             </li>
@@ -50,11 +50,6 @@ const Footer: React.FC = () => {
                 Disclaimer
               </a>
             </li>
-            <li>
-              <a href="/refund" className="hover:underline block mb-1">
-                Refund Policy
-              </a>
-            </li>
           </ul>
         </div>
 
@@ -63,22 +58,22 @@ const Footer: React.FC = () => {
           <h3 className="text-lg font-semibold mb-2">Social Links</h3>
           <ul>
             <li>
-              <a href="https://twitter.com/promptearn" className="hover:underline block mb-1">
+              <a href="https://twitter.com/profitplus" className="hover:underline block mb-1">
                 Twitter
               </a>
             </li>
             <li>
-              <a href="https://www.facebook.com/profile.php?id=100091985422824" className="hover:underline block mb-1">
-                Facebook
+              <a href="#" className="hover:underline block mb-1">
+                Whatsapp
               </a>
             </li>
             <li>
-              <a href="https://www.instagram.com/promptearn/" className="hover:underline block mb-1">
+              <a href="https://www.instagram.com/profitplus/" className="hover:underline block mb-1">
                 Instagram
               </a>
             </li>
             <li>
-              <a href="mailto:help@promptearn.com" className="hover:underline block mb-1">
+              <a href="mailto:help@profitplus.com" className="hover:underline block mb-1">
                 Email
               </a>
             </li>
