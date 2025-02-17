@@ -1,5 +1,5 @@
 import React from "react";
-import frameImage from "../../assets/Frame34000004334.png";
+import frameImage from "../../assets/Frame.png";
 import star from "../../assets/star23.png";
 import DefaultLayout from "../../layouts/DefaultLayout";
 
