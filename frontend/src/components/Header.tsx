@@ -122,6 +122,24 @@ const Header: React.FC = () => {
               </NavLink>
             </li>
 
+            {/* UploadCourses Link */}
+            <li>
+              <NavLink
+                to="/upload-course"
+                className={({ isActive }) =>
+                  `block px-4 py-2 rounded-md transition-colors duration-300 ${
+                    isActive
+                      ? "bg-white text-blue-700 font-bold"
+                      : "hover:bg-white hover:text-blue-700"
+                  }`
+                }
+                aria-label="UploadCourses"
+                onClick={toggleMenu}
+              >
+                Upload Courses
+              </NavLink>
+            </li>
+
             {/* Vendors Link */}
             <li>
               <NavLink

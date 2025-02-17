@@ -17,6 +17,7 @@ import BecomeVendorPage from "./pages/vendor/vendor";
 import ProductsPage from "./pages/products/index";
 import WithdrawalsPage from "./pages/transaction/withdrawals";
 import ProfilePage from "./pages/profile/index";
+import UploadCoursePage from "./pages/courses/uploadcourses";
 
 import "./index.css";
 
@@ -41,6 +42,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         <Route path="/manage-products" element={<ProductsPage />} />
         <Route path="/withdrawals" element={<WithdrawalsPage />} />
         <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/upload-course" element={<UploadCoursePage />} />
         {/* Add more routes here */}
       </Routes>
     </BrowserRouter>
