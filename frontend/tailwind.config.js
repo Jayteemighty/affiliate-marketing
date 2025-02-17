@@ -8,6 +8,9 @@ export default {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        raleway: ['Raleway', 'sans-serif'],
+      },
       colors: {
         customGreen: "#4CAF50",
       },

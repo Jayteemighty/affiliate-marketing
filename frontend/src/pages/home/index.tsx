@@ -143,7 +143,7 @@ const HomePage: React.FC = () => {
               <h2 className="text-[#05212f] font-raleway font-bold text-2xl mb-4">
                 Have a product or course that deserves more sales?
               </h2>
-              <h3 className="text-purple-800 leading-8 font-bold font-raleway text-xl mb-6">
+              <h3 className="text-[#05212f] leading-8 font-bold font-raleway text-xl mb-6">
                 Partner with us to reach a wider audience and boost sales! Our platform connects you with experienced affiliates who can promote your products worldwide.
               </h3>
               <p className="font-raleway text-gray-700 mb-6">

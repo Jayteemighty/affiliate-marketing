@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
-import logo from "../assets/result (3).png";
+// import logo from "../assets/result (3).png";
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -13,13 +13,20 @@ const Header: React.FC = () => {
     <header className="bg-gradient-to-r bg-gray-800 text-white shadow-lg">
       <div className="container mx-auto px-4 flex justify-between items-center py-4">
         {/* Logo or Brand Name */}
-        <nav className="bg-gray-800 flex items-center">
+        {/* <nav className="bg-gray-800 flex items-center">
           <NavLink to="/" className="navbar-brand flex items-center">
             <img
               src={logo}
               alt="ProfitPlus"
               className="h-15 w-auto hover:opacity-80 transition-opacity duration-300"
             />
+          </NavLink>
+        </nav> */}
+
+        <nav className="flex items-center">
+          <NavLink to="/" className="navbar-brand flex items-center text-2xl font-bold">
+            <span className="text-green-500">Profit</span>
+            <span className="text-white">Plus</span>
           </NavLink>
         </nav>
 
