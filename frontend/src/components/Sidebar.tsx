@@ -21,17 +21,30 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       <aside
         className={`w-64 bg-purple-800 text-white h-screen fixed left-0 top-0 overflow-y-auto transform transition-transform duration-300 ease-in-out z-50 ${
           isOpen ? "translate-x-0" : "-translate-x-full"
-        } md:translate-x-0 md:w-64`}
+        } md:translate-x-0`}
       >
-        {/* Close Button ("X") for Mobile */}
+        {/* Close Button (Visible on Mobile) */}
         <button
           onClick={onClose}
-          className="absolute top-4 left-4 md:hidden text-white focus:outline-none"
+          className="md:hidden p-4 text-white focus:outline-none"
         >
-          <span className="material-icons text-xl">close</span>
+          <svg
+            className="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
         </button>
 
-        {/* Logo or Brand Name */}
+        {/* Logo */}
         <div className="flex items-center justify-center h-20">
           <h1 className="text-2xl font-bold">Profit Earn</h1>
         </div>
@@ -41,24 +54,28 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           <Link
             to="/dashboard"
             className="block py-2 px-4 hover:bg-gray-700 rounded-md transition duration-300"
+            onClick={onClose}
           >
             <span className="material-icons mr-2">dashboard</span> Dashboard
           </Link>
           <Link
             to="/marketplace"
             className="block py-2 px-4 hover:bg-gray-700 rounded-md transition duration-300"
+            onClick={onClose}
           >
             <span className="material-icons mr-2">store</span> Marketplace
           </Link>
           <Link
             to="/aim-course"
             className="block py-2 px-4 hover:bg-gray-700 rounded-md transition duration-300"
+            onClick={onClose}
           >
             <span className="material-icons mr-2">school</span> AIM Course
           </Link>
           <Link
             to="/transaction-status"
             className="block py-2 px-4 hover:bg-gray-700 rounded-md transition duration-300"
+            onClick={onClose}
           >
             <span className="material-icons mr-2">library_books</span> Check
             Transaction Status
@@ -66,12 +83,14 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           <Link
             to="/leaderboard"
             className="block py-2 px-4 hover:bg-gray-700 rounded-md transition duration-300"
+            onClick={onClose}
           >
             <span className="material-icons mr-2">star</span> Affiliate Leaderboard
           </Link>
           <Link
             to="/become-vendor"
             className="block py-2 px-4 hover:bg-gray-700 rounded-md transition duration-300"
+            onClick={onClose}
           >
             <span className="material-icons mr-2">content_paste</span> Become a
             Vendor
@@ -79,6 +98,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           <Link
             to="/manage-products"
             className="block py-2 px-4 hover:bg-gray-700 rounded-md transition duration-300"
+            onClick={onClose}
           >
             <span className="material-icons mr-2">library_books</span> Manage
             Products
@@ -86,24 +106,24 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           <Link
             to="/withdrawals"
             className="block py-2 px-4 hover:bg-gray-700 rounded-md transition duration-300"
+            onClick={onClose}
           >
             <span className="material-icons mr-2">money</span> Withdrawals
           </Link>
           <Link
             to="/profile"
             className="block py-2 px-4 hover:bg-gray-700 rounded-md transition duration-300"
+            onClick={onClose}
           >
             <span className="material-icons mr-2">person</span> Profile
           </Link>
-          <button
-            onClick={() => {
-              localStorage.removeItem("authToken"); // Clear authentication token
-              window.location.href = "/login"; // Redirect to login page
-            }}
+          <Link
+            to="/logout"
             className="block py-2 px-4 hover:bg-gray-700 rounded-md transition duration-300"
+            onClick={onClose}
           >
             <span className="material-icons mr-2">logout</span> Logout
-          </button>
+          </Link>
         </nav>
       </aside>
     </>
