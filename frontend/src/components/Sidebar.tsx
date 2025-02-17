@@ -21,12 +21,22 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       <aside
         className={`w-64 bg-purple-800 text-white h-screen fixed left-0 top-0 overflow-y-auto transform transition-transform duration-300 ease-in-out z-50 ${
           isOpen ? "translate-x-0" : "-translate-x-full"
-        } md:translate-x-0`}
+        } md:translate-x-0 md:w-64`}
       >
+        {/* Close Button ("X") for Mobile */}
+        <button
+          onClick={onClose}
+          className="absolute top-4 left-4 md:hidden text-white focus:outline-none"
+        >
+          <span className="material-icons text-xl">close</span>
+        </button>
+
+        {/* Logo or Brand Name */}
         <div className="flex items-center justify-center h-20">
           <h1 className="text-2xl font-bold">Profit Earn</h1>
         </div>
 
+        {/* Navigation Links */}
         <nav className="space-y-4 p-4">
           <Link
             to="/dashboard"
@@ -85,12 +95,15 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           >
             <span className="material-icons mr-2">person</span> Profile
           </Link>
-          <Link
-            to="/logout"
+          <button
+            onClick={() => {
+              localStorage.removeItem("authToken"); // Clear authentication token
+              window.location.href = "/login"; // Redirect to login page
+            }}
             className="block py-2 px-4 hover:bg-gray-700 rounded-md transition duration-300"
           >
             <span className="material-icons mr-2">logout</span> Logout
-          </Link>
+          </button>
         </nav>
       </aside>
     </>

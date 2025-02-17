@@ -1,5 +1,6 @@
 import React from "react";
 import DefaultLayout from "../../layouts/DefaultLayout";
+import SmileyGuy from "../../components/SmileyGuy";
 
 const AffiliatePage: React.FC = () => {
   return (
@@ -56,6 +57,8 @@ const AffiliatePage: React.FC = () => {
             </div>
           </div>
         </section>
+
+        <SmileyGuy />
 
         {/* Benefits Section */}
         <section className="mt-12">
