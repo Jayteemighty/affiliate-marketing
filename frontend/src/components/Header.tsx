@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
-// import logo from "../assets/result (3).png";
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -12,17 +11,6 @@ const Header: React.FC = () => {
   return (
     <header className="bg-gradient-to-r bg-gray-800 text-white shadow-lg">
       <div className="container mx-auto px-4 flex justify-between items-center py-4">
-        {/* Logo or Brand Name */}
-        {/* <nav className="bg-gray-800 flex items-center">
-          <NavLink to="/" className="navbar-brand flex items-center">
-            <img
-              src={logo}
-              alt="ProfitPlus"
-              className="h-15 w-auto hover:opacity-80 transition-opacity duration-300"
-            />
-          </NavLink>
-        </nav> */}
-
         <nav className="flex items-center">
           <NavLink to="/" className="navbar-brand flex items-center text-2xl font-bold">
             <span className="text-green-500">Profit</span>
@@ -85,7 +73,6 @@ const Header: React.FC = () => {
                 Home
               </NavLink>
             </li>
-
             {/* About Us Link */}
             <li>
               <NavLink
@@ -103,7 +90,6 @@ const Header: React.FC = () => {
                 About Us
               </NavLink>
             </li>
-
             {/* Affiliates Link */}
             <li>
               <NavLink
@@ -121,7 +107,6 @@ const Header: React.FC = () => {
                 Affiliates
               </NavLink>
             </li>
-
             {/* UploadCourses Link */}
             <li>
               <NavLink
@@ -139,7 +124,6 @@ const Header: React.FC = () => {
                 Upload Courses
               </NavLink>
             </li>
-
             {/* Vendors Link */}
             <li>
               <NavLink
@@ -157,7 +141,6 @@ const Header: React.FC = () => {
                 Vendors
               </NavLink>
             </li>
-
             {/* FAQ Link */}
             <li>
               <NavLink
@@ -175,9 +158,8 @@ const Header: React.FC = () => {
                 FAQ
               </NavLink>
             </li>
-
-            {/* Login Link */}
-            <li>
+            {/* Login and Create Account Links */}
+            <li className=" flex space-x-4">
               <NavLink
                 to="/login"
                 className={({ isActive }) =>
@@ -192,14 +174,10 @@ const Header: React.FC = () => {
               >
                 Login
               </NavLink>
-            </li>
-
-            {/* Create Account Link */}
-            <li>
               <NavLink
                 to="/register"
                 className={({ isActive }) =>
-                  `block px-4 py-2 rounded-md transition-colors duration-300 ${
+                  `block px-4 py-2 rounded-md border border-gray-300 shadow-md transition-transform duration-300 transform hover:scale-105 ${
                     isActive
                       ? "bg-white text-blue-700 font-bold"
                       : "hover:bg-white hover:text-blue-700"
