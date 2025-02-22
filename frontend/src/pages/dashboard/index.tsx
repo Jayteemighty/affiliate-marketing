@@ -79,7 +79,7 @@ const DashboardPage: React.FC = () => {
             </div>
 
             {/* Filter by Date Buttons */}
-            <div className="flex items-center space-x-4">
+            {/* <div className="flex items-center space-x-4">
               <button
                 onClick={toggleDateFilter}
                 id="show1"
@@ -96,7 +96,7 @@ const DashboardPage: React.FC = () => {
                   Filter by date
                 </button>
               )}
-            </div>
+            </div> */}
           </div>
         </div>
 

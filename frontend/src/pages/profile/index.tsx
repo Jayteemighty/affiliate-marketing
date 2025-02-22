@@ -76,6 +76,15 @@ const ProfilePage: React.FC = () => {
 
   return (
     <div className="flex h-screen bg-gray-100">
+      {/* Hamburger Menu Button for Mobile */}
+      <button
+        onClick={toggleSidebar}
+        className="md:hidden fixed top-4 left-4 bg-gray-800 text-white p-2 rounded-md z-50"
+        aria-label="Toggle navigation menu"
+      >
+        <span className="material-icons text-xl">menu</span>
+      </button>
+      
       {/* Sidebar */}
       <Sidebar isOpen={isSidebarOpen} onClose={toggleSidebar} />
 

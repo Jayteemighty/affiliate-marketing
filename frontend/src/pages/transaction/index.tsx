@@ -2,6 +2,11 @@ import React, { useState } from "react";
 import Sidebar from "../../components/Sidebar";
 
 const TransactionStatusPage: React.FC = () => {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
+
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -9,13 +14,11 @@ const TransactionStatusPage: React.FC = () => {
   // Function to handle transaction status check
   const handleCheckStatus = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!email.trim()) {
       setError("Please enter a valid email address.");
       setStatus(null);
       return;
     }
-
     try {
       const response = await fetch("https://profitplusbackend.com.ng/api/check-transaction", {
         method: "POST",
@@ -41,15 +44,18 @@ const TransactionStatusPage: React.FC = () => {
       setStatus(null);
     }
   };
-  
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-      
-  const toggleSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen);
-  };
 
   return (
     <div className="flex h-screen bg-gray-100">
+      {/* Hamburger Menu Button for Mobile */}
+      <button
+        onClick={toggleSidebar}
+        className="md:hidden fixed top-4 left-4 bg-gray-800 text-white p-2 rounded-md z-50"
+        aria-label="Toggle navigation menu"
+      >
+        <span className="material-icons text-xl">menu</span>
+      </button>
+
       {/* Sidebar */}
       <Sidebar isOpen={isSidebarOpen} onClose={toggleSidebar} />
 
@@ -100,13 +106,13 @@ const TransactionStatusPage: React.FC = () => {
           <p className="text-gray-500">
             For Support: Send a mail to{" "}
             <a
-              href="mailto:help@promptearn.com"
+              href="mailto:help@profitplus.com"
               className="text-blue-600 hover:underline"
             >
-              help@promptearn.com
+              help@profitplus.com
             </a>
           </p>
-          <p className="text-gray-500 mt-2">&copy; 2024, PromptEarn</p>
+          <p className="text-gray-500 mt-2">&copy; 2024, Profitplus</p>
         </footer>
       </div>
     </div>

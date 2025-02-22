@@ -118,7 +118,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
             <span className="material-icons mr-2">person</span> Profile
           </Link>
           <Link
-            to="/logout"
+            to="/"
             className="block py-2 px-4 hover:bg-gray-700 rounded-md transition duration-300"
             onClick={onClose}
           >
