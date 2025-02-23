@@ -17,9 +17,9 @@ const DashboardPage: React.FC = () => {
   };
 
   // Function to toggle date filter dropdown
-  // const toggleDateFilter = () => {
-  //   setIsDateFilterVisible((prev) => !prev);
-  // };
+  const toggleDateFilter = () => {
+    setIsDateFilterVisible((prev) => !prev);
+  };
 
   return (
     <div className="flex h-screen bg-gray-100">
