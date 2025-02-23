@@ -9,7 +9,7 @@ const DashboardPage: React.FC = () => {
   };
 
   const [currency, setCurrency] = useState("1"); // Default currency value
-  const [isDateFilterVisible, setIsDateFilterVisible] = useState(false); // Toggle date filter visibility
+  // const [isDateFilterVisible, setIsDateFilterVisible] = useState(false); // Toggle date filter visibility
 
   // Function to handle currency change
   const handleCurrencyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -17,9 +17,9 @@ const DashboardPage: React.FC = () => {
   };
 
   // Function to toggle date filter dropdown
-  const toggleDateFilter = () => {
-    setIsDateFilterVisible((prev) => !prev);
-  };
+  // const toggleDateFilter = () => {
+  //   setIsDateFilterVisible((prev) => !prev);
+  // };
 
   return (
     <div className="flex h-screen bg-gray-100">
