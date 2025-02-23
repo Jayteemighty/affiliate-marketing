@@ -17,9 +17,9 @@ const DashboardPage: React.FC = () => {
   };
 
   // Function to toggle date filter dropdown
-  const toggleDateFilter = () => {
-    setIsDateFilterVisible((prev) => !prev);
-  };
+  // const toggleDateFilter = () => {
+  //   setIsDateFilterVisible((prev) => !prev);
+  // };
 
   return (
     <div className="flex h-screen bg-gray-100">
@@ -62,7 +62,7 @@ const DashboardPage: React.FC = () => {
             <div className="relative inline-block text-left">
               <i
                 className="fa fa-caret-down absolute right-4 top-2 cursor-pointer text-green-500"
-                onClick={toggleDateFilter} // Reuse the same icon for dropdown toggle
+                // onClick={toggleDateFilter} // Reuse the same icon for dropdown toggle
               ></i>
               <select
                 id="currency"
