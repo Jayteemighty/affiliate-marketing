@@ -1,11 +1,11 @@
 import express from 'express';
 import { protect } from '../middleware/authMiddleware';
 import {
-    adminlogin,
-    resetpassword,
-    verifyemail,
-    userlogin,
-    userregister,
+    adminLogin,
+    resetPassword,
+    verifyEmail,
+    userLogin,
+    userRegister,
     createCourse,
     getUserCourses,
 } from '../controllers/authentication';
@@ -36,11 +36,11 @@ import { uploadCourse, paymentCallback } from '../controllers/courseManagement';
 const appRouter = express.Router();
 
 // Authentication Routes
-appRouter.post('/api/admin/login', protect, adminlogin);
-appRouter.post('/api/user/login', userlogin);
-appRouter.post('/api/register', userregister);
-appRouter.post('/api/reset-password', resetpassword);
-appRouter.post('/api/verify-email', verifyemail);
+appRouter.post('/api/admin/login', protect, adminLogin);
+appRouter.post('/api/user/login', userLogin);
+appRouter.post('/api/register', userRegister);
+appRouter.post('/api/reset-password', resetPassword);
+appRouter.post('/api/verify-email', verifyEmail);
 
 // Dashboard Routes
 appRouter.get('/api/admindash', protect, admindashboard);
