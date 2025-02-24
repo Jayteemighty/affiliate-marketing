@@ -1,8 +1,17 @@
-const mongoose = require('mongoose');
+import mongoose, { Document, Schema } from 'mongoose';
 
-const initiateWithdrawSchema = new mongoose.Schema({
+interface IInitiateWithdraw extends Document {
+    userId: mongoose.Types.ObjectId;
+    amount: number;
+    bankName: string;
+    accountNumber: string;
+    status: 'Pending' | 'Approved' | 'Rejected';
+    date: Date;
+}
+
+const initiateWithdrawSchema: Schema = new Schema({
     userId: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'User',  // This references the User model
         required: true,
     },
@@ -29,6 +38,6 @@ const initiateWithdrawSchema = new mongoose.Schema({
     },
 });
 
-const InitiateWithdraw = mongoose.model('InitiateWithdraw', initiateWithdrawSchema);
+const InitiateWithdraw = mongoose.model<IInitiateWithdraw>('InitiateWithdraw', initiateWithdrawSchema);
 
-module.exports = InitiateWithdraw;
+export default InitiateWithdraw;
