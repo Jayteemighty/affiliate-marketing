@@ -5,7 +5,6 @@ import { authMiddleware } from "../middleware/authMiddleware";
 
 const router = express.Router();
 
-// Define a custom request interface to extend Express.Request with userId
 interface CustomRequest extends Request {
   userId?: string;
 }
