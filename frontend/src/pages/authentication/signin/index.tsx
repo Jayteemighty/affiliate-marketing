@@ -4,45 +4,46 @@ import logo from "../../../assets/result (3).png";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
+import LoadingSpinner from "../../../components/LoadingSpinner";
+import { BASE_URL } from "../../../libs/constants";
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(false); // Loading state
 
-  // Handle form submission
   const handleLogin = async (event: React.FormEvent) => {
     event.preventDefault();
 
-    // Validate inputs
     if (!email || !password) {
       toast.error("Please fill in both email and password.");
       return;
     }
 
-    try {
-      // Send POST request to the backend
-      const response = await axios.post(
-        "https://backend-api.theprofitplus.com.ng/api/user/login",
-        { email, password }
-      );
+    setIsLoading(true);
 
-      // Handle successful login
+    try {
+      const response = await axios.post(`${BASE_URL}/api/user/login`, {
+        email,
+        password,
+      });
+
       if (response.status === 200) {
         toast.success("User signed in successfully!");
         localStorage.setItem("user", JSON.stringify(response.data));
 
-        // Redirect to dashboard after 2 seconds
         setTimeout(() => {
-          window.location.href = "/dashboard"; // Replace with your desired redirect path
+          window.location.href = "/dashboard";
         }, 2000);
       }
     } catch (error) {
-      // Handle errors
       if (axios.isAxiosError(error)) {
         toast.error(error.response?.data.message || "Login failed. Please try again.");
       } else {
         toast.error("An unexpected error occurred. Please try again.");
       }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -53,7 +54,7 @@ const LoginPage: React.FC = () => {
         <div className="hidden lg:block w-1/2 bg-gray-900 text-white flex items-center justify-center">
           <div className="space-y-8">
             <img
-              src={logo} // Replace with your logo path
+              src={logo}
               alt="PromptEarn"
               className="w-64 mb-8"
             />
@@ -113,32 +114,10 @@ const LoginPage: React.FC = () => {
             <button
               type="submit"
               className="w-full bg-purple-800 text-white px-4 py-2 rounded-md hover:bg-green-600 transition duration-300"
+              disabled={isLoading}
             >
-              Login
+              {isLoading ? <LoadingSpinner /> : "Login"}
             </button>
-
-            {/* Forgot Password Link */}
-            <div className="text-center">
-              <a
-                href="/forgot-password"
-                className="text-sm text-blue-600 hover:underline"
-              >
-                Forgot Password?
-              </a>
-            </div>
-
-            {/* Don't Have an Account? */}
-            <div className="text-center">
-              <span className="text-sm text-gray-600">
-                Don't have an account?{" "}
-                <a
-                  href="/register"
-                  className="text-blue-600 hover:underline"
-                >
-                  Sign Up
-                </a>
-              </span>
-            </div>
           </form>
         </div>
       </section>
