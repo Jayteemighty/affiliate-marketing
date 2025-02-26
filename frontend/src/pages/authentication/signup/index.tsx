@@ -70,7 +70,7 @@ const SignUpPage: React.FC = () => {
 
         // Redirect after 3 seconds
         setTimeout(() => {
-          window.location.href = "/super/index.html";
+          window.location.href = "/dashboard";
         }, 3000);
       }
     } catch (error) {
