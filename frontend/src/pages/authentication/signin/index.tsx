@@ -4,13 +4,13 @@ import logo from "../../../assets/result (3).png";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
-import LoadingSpinner from "../../../components/LoadingSpinner";
+import Preloader from "../../../components/Preloader";
 import { BASE_URL } from "../../../libs/constants";
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [isLoading, setIsLoading] = useState<boolean>(false); // Loading state
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const handleLogin = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -49,6 +49,9 @@ const LoginPage: React.FC = () => {
 
   return (
     <DefaultLayout>
+      {/* Show Preloader when isLoading is true */}
+      {isLoading && <Preloader />}
+
       <section className="flex h-screen">
         {/* Left Section */}
         <div className="hidden lg:block w-1/2 bg-gray-900 text-white flex items-center justify-center">
@@ -116,7 +119,7 @@ const LoginPage: React.FC = () => {
               className="w-full bg-purple-800 text-white px-4 py-2 rounded-md hover:bg-green-600 transition duration-300"
               disabled={isLoading}
             >
-              {isLoading ? <LoadingSpinner /> : "Login"}
+              {isLoading ? "Logging In..." : "Login"}
             </button>
           </form>
         </div>
