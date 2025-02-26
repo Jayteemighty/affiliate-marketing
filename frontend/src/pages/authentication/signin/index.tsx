@@ -1,51 +1,47 @@
 import React, { useState } from "react";
 import DefaultLayout from "../../../layouts/DefaultLayout";
 import logo from "../../../assets/result (3).png";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import axios from "axios";
 
 const LoginPage: React.FC = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
 
   // Handle form submission
   const handleLogin = async (event: React.FormEvent) => {
     event.preventDefault();
 
+    // Validate inputs
     if (!email || !password) {
-      alert("Please fill in both email and password");
+      toast.error("Please fill in both email and password.");
       return;
     }
 
     try {
-      const response = await fetch("https://backend-api.theprofitplus.com.ng/api/user/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
+      // Send POST request to the backend
+      const response = await axios.post(
+        "https://backend-api.theprofitplus.com.ng/api/user/login",
+        { email, password }
+      );
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Login failed");
+      // Handle successful login
+      if (response.status === 200) {
+        toast.success("User signed in successfully!");
+        localStorage.setItem("user", JSON.stringify(response.data));
+
+        // Redirect to dashboard after 2 seconds
+        setTimeout(() => {
+          window.location.href = "/dashboard"; // Replace with your desired redirect path
+        }, 2000);
       }
-
-      const userData = await response.json();
-      console.log(userData);
-
-      // Store user data in localStorage
-      localStorage.setItem("user", JSON.stringify(userData));
-
-      alert("User signed in successfully");
-      setTimeout(() => {
-        window.location.href = "/dashboard"; // Redirect to dashboard or another page
-      }, 2000);
     } catch (error) {
-      if (error instanceof Error) {
-        console.error("Error:", error.message);
-        alert(`An error occurred: ${error.message}`);
+      // Handle errors
+      if (axios.isAxiosError(error)) {
+        toast.error(error.response?.data.message || "Login failed. Please try again.");
       } else {
-        console.error("An unknown error occurred:", error);
-        alert("An unknown error occurred. Please try again.");
+        toast.error("An unexpected error occurred. Please try again.");
       }
     }
   };
@@ -146,6 +142,7 @@ const LoginPage: React.FC = () => {
           </form>
         </div>
       </section>
+      <ToastContainer />
     </DefaultLayout>
   );
 };
