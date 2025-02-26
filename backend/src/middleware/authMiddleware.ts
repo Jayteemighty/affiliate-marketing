@@ -19,7 +19,7 @@ const protect = asyncHandler(async (req: AuthRequest, res: Response, next: NextF
         try {
             const decoded = jwt.verify(token, process.env.JWT_SECRET!);
             const decodedUser = await User.findById((decoded as any).id).select('-password');
-            req.auth = decodedUser?._id;
+            req.auth = decodedUser?._id as string;
             next();
         } catch (error) {
             if (error instanceof TokenExpiredError) {

@@ -1,16 +1,13 @@
-import express, { Request, Response } from "express";
+import { Request, Response } from "express";
 import Sale from "../model/sales";
 import User from "../model/user";
-import { authMiddleware } from "../middleware/authMiddleware";
-
-const router = express.Router();
 
 interface CustomRequest extends Request {
   userId?: string;
 }
 
 // Dashboard controller for user data and sales statistics
-export const userDash = async (req: CustomRequest, res: Response) => {
+export const userDash = async (req: CustomRequest, res: Response): Promise<void> => {
   try {
     // Extract userId from the authenticated request
     const userId = req.userId;
@@ -44,6 +41,3 @@ export const userDash = async (req: CustomRequest, res: Response) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
-
-
-module.exports = { userDash };

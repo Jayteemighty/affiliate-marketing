@@ -58,4 +58,8 @@ const initiateWithdraw = async (req: InitiateWithdrawRequest, res: Response) => 
 // Set up the route and middleware
 router.post('/initiatewithdraw', authMiddleware, initiateWithdraw);
 
-export default router;
+// export default router;
+export {
+    router,
+    initiateWithdraw
+}

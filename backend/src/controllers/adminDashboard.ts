@@ -11,34 +11,34 @@ interface AdminRequest extends Request {
 /**
  * Get admin dashboard data including users, sales, and summary statistics
  */
-const adminDashboard = async (req: AdminRequest, res: Response) => {
+export const adminDashboard = async (req: AdminRequest, res: Response): Promise<void> => {
   try {
     const adminId = req.adminId;
-    
+
     if (!adminId) {
       return res.status(401).json({ message: 'Authentication required' });
     }
-    
+
     // Fetch admin, users and sales data
     const admin = await Admin.findById(adminId);
-    
+
     if (!admin) {
       return res.status(404).json({ message: 'Admin not found' });
     }
-    
+
     const users = await User.find();
     const sales = await Sale.find();
-    
+
     // Calculate statistics
     const totalSales = sales.reduce((acc, sale) => acc + sale.amount, 0);
     const totalCommissions = sales.reduce((acc, sale) => acc + sale.commission, 0);
-    
+
     // Return dashboard data
-    res.status(200).json({ 
-      admin, 
-      users, 
-      sales, 
-      totalSales, 
+    res.status(200).json({
+      admin,
+      users,
+      sales,
+      totalSales,
       totalCommissions,
       userCount: users.length,
       salesCount: sales.length
@@ -47,8 +47,4 @@ const adminDashboard = async (req: AdminRequest, res: Response) => {
     console.error('Admin dashboard error:', error);
     res.status(500).json({ message: 'An error occurred while loading dashboard data' });
   }
-};
-
-export {
-  adminDashboard
 };
