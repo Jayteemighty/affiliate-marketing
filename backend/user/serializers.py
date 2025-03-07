@@ -13,7 +13,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['email', 'first_name', 'last_name', 'phone_number', 'role', 'profile_pic']
+        fields = ['email', 'first_name', 'last_name', 'phone_number']
         
 
 class CreateAccountSerializer(serializers.ModelSerializer):
@@ -23,7 +23,7 @@ class CreateAccountSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['email', 'password', 'password2', 'first_name', 'last_name', 'phone_number', 'role', 'profile_pic']
+        fields = ['email', 'password', 'password2', 'first_name', 'last_name', 'phone_number']
         read_only_fields = ['id']        
         extra_kwargs = {
             'password': {'write_only': True}
