@@ -30,28 +30,27 @@ def send_verification_email(email):
     
     user = User.objects.get(email=email)
     
-    otp = ''.join([str(random.randint(0, 9)) for _ in range(6)])
+    otp = ''.join([str(random.randint(0, 9)) for _ in range(4)])
     OTP.objects.create(email=user.email, otp=otp, otp_type='signup')
     
     subject = 'Welcome! Verify your email address'
     body = f'Hi, {user.first_name}.\n\nThanks for signing up on Profit Plus.\nThis is your OTP to verify your account:\n{otp}.\n\nThe OTP expires after 10 minutes.\n\nIf you did not request for this OTP, kindly ignore.\nThank you.'
     
-    Util.send_email(user.email, subject, body)
-        
+    Util.send_email(user.email, subject, body, is_html=False)
+    
 
 def send_password_reset_email(email):
     '''Function to send password reset email'''
     
     user = User.objects.get(email=email)
     
-    otp = ''.join([str(random.randint(0, 9)) for _ in range(6)])
+    otp = ''.join([str(random.randint(0, 9)) for _ in range(4)])
     OTP.objects.create(email=user.email, otp=otp, otp_type='passwordreset')
     
     subject = 'Password reset'
     body = f'Hi, {user.first_name}.\n\nThanks for choosing Profit Plus.\nThis is your OTP to reset your password:\n{otp}\n\nThe OTP expires after 10 minutes..\n\nIf you did not request for this OTP, kindly ignore.\nThank you.'
     
-    Util.send_email(user.email, subject, body)
-
+    Util.send_email(user.email, subject, body, is_html=False)
 
 
 # --------------------------------------------------------------------------
