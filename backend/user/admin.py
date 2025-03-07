@@ -13,7 +13,7 @@ class UserAdmin(BaseUserAdmin):
         (None, {'fields': ('email', 'password', 'first_name', 'username',
          'last_name', 'phone_number')}),
         (_('Permissions'), {
-            'fields': ('is_active', 'is_staff', 'is_superuser', 'is_verified', 'groups', 'user_permissions'),
+            'fields': ('is_active', 'is_staff', 'is_superuser', 'is_verified'),
         })
     )
     model = CustomUser
@@ -29,7 +29,7 @@ class UserAdmin(BaseUserAdmin):
     list_filter = ('is_staff', 'is_superuser', 'is_active', 'groups')
     search_fields = ('email', 'first_name', 'last_name')
     ordering = ('email',)
-    filter_horizontal = ('groups', 'user_permissions',)
+    # filter_horizontal = ('groups', 'user_permissions',)
 
 admin.site.register(CustomUser, UserAdmin)
 admin.site.register(OTP)

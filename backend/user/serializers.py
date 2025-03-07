@@ -36,10 +36,6 @@ class CreateAccountSerializer(serializers.ModelSerializer):
         if data['password'] != data['password2']:
             raise serializers.ValidationError({'error': 'Your passwords do not match'}, code=status.HTTP_400_BAD_REQUEST)
         
-        # validate subscription plan
-        if data['role'] not in ['admin', 'customer', 'vendor']:
-            raise serializers.ValidationError({'error': 'This role is not available. Choose between admin, customer, and vendor'}, code=status.HTTP_400_BAD_REQUEST)
-        
         # check if email exists
         if User.objects.filter(email=data['email']).exists():
             raise serializers.ValidationError({'error': 'Email already exists'}, code=status.HTTP_400_BAD_REQUEST)

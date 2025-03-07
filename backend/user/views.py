@@ -34,7 +34,7 @@ def send_verification_email(email):
     OTP.objects.create(email=user.email, otp=otp, otp_type='signup')
     
     subject = 'Welcome! Verify your email address'
-    body = f'Hi, {user.first_name}.\n\nThanks for signing up on Vendorhive360.\nThis is your OTP to verify your account:\n{otp}.\n\nThe OTP expires after 10 minutes.\n\nIf you did not request for this OTP, kindly ignore.\nThank you.'
+    body = f'Hi, {user.first_name}.\n\nThanks for signing up on Profit Plus.\nThis is your OTP to verify your account:\n{otp}.\n\nThe OTP expires after 10 minutes.\n\nIf you did not request for this OTP, kindly ignore.\nThank you.'
     
     Util.send_email(user.email, subject, body)
         
@@ -48,7 +48,7 @@ def send_password_reset_email(email):
     OTP.objects.create(email=user.email, otp=otp, otp_type='passwordreset')
     
     subject = 'Password reset'
-    body = f'Hi, {user.first_name}.\n\nThanks for choosing Vendorhive360.\nThis is your OTP to reset your password:\n{otp}\n\nThe OTP expires after 10 minutes..\n\nIf you did not request for this OTP, kindly ignore.\nThank you.'
+    body = f'Hi, {user.first_name}.\n\nThanks for choosing Profit Plus.\nThis is your OTP to reset your password:\n{otp}\n\nThe OTP expires after 10 minutes..\n\nIf you did not request for this OTP, kindly ignore.\nThank you.'
     
     Util.send_email(user.email, subject, body)
 
@@ -61,7 +61,7 @@ class RegisterView(generics.GenericAPIView):
     '''View to register users'''
 
     serializer_class = serializers.CreateAccountSerializer
-    parser_classes = [MultiPartParser]
+    # parser_classes = [MultiPartParser]
     permission_classes = [AllowAny]
     queryset = User.objects.all()
     
@@ -77,7 +77,7 @@ class RegisterView(generics.GenericAPIView):
         except Exception as e:
             return Response({
                 'exception': f'{e}',
-                'error': 'An error occured. Try again later',
+                'error': 'could not send emailAn error occured. Try again later',
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
         return Response(serializer.data, status=status.HTTP_201_CREATED)
