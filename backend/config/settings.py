@@ -75,6 +75,8 @@ TEMPLATES = [
     },
 ]
 
+AUTH_USER_MODEL = "user.CustomUser"
+
 WSGI_APPLICATION = "config.wsgi.application"
 
 

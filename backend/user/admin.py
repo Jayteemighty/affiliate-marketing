@@ -1,37 +1,35 @@
-# from django.contrib import admin
+from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.utils.translation import gettext_lazy as _
+from .forms import UserChangeForm, UserCreationForm
+from .models import CustomUser, OTP
 
-# from django.contrib import admin
-# from django.contrib.auth.admin import UserAdmin
+# Unregister the default UserAdmin if it's already registered
+if admin.site.is_registered(CustomUser):
+    admin.site.unregister(CustomUser)
 
-# from user.models import OTP
-# from .forms import UserChangeForm, UserCreationForm
-# from django.contrib.auth import get_user_model
-# from django.utils.translation import gettext_lazy as _
+class UserAdmin(BaseUserAdmin):
+    fieldsets = (
+        (None, {'fields': ('email', 'password', 'first_name', 'username',
+         'last_name', 'phone_number')}),
+        (_('Permissions'), {
+            'fields': ('is_active', 'is_staff', 'is_superuser', 'is_verified', 'groups', 'user_permissions'),
+        })
+    )
+    model = CustomUser
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': ('email', 'password1', 'password2'),
+        }),
+    )
+    form = UserChangeForm
+    add_form = UserCreationForm
+    list_display = ('email', 'id', 'first_name', 'last_name', 'phone_number', 'is_active', 'is_verified')
+    list_filter = ('is_staff', 'is_superuser', 'is_active', 'groups')
+    search_fields = ('email', 'first_name', 'last_name')
+    ordering = ('email',)
+    filter_horizontal = ('groups', 'user_permissions',)
 
-# User = get_user_model()
-
-# class UserAdmin(UserAdmin):
-#     fieldsets = (
-#         (None, {'fields': ('email', 'password', 'first_name',
-#          'last_name', 'profile_pic', 'phone_number', 'role', 'sign_up_mode')}),
-#         (_('Permissions'), {
-#             'fields': ('is_active', 'is_staff', 'is_superuser', 'is_verified', 'groups', 'user_permissions'),
-#         })
-#     )
-#     model = User
-#     add_fieldsets = (
-#         (None, {
-#             'classes': ('wide',),
-#             'fields': ('email', 'password1', 'password2'),
-#         }),
-#     )
-#     form = UserChangeForm
-#     add_form = UserCreationForm
-#     list_display = ('email', 'id', 'first_name', 'last_name', 'phone_number', 'is_active', 'is_verified', 'role', 'sign_up_mode')
-#     list_filter = ('is_staff', 'is_superuser', 'is_active', 'groups')
-#     search_fields = ('email', 'first_name', 'last_name')
-#     ordering = ('email',)
-#     filter_horizontal = ('groups', 'user_permissions',)
-
-# admin.site.register(User, UserAdmin)
-# admin.site.register(OTP)
+admin.site.register(CustomUser, UserAdmin)
+admin.site.register(OTP)

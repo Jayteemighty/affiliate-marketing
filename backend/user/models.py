@@ -1,30 +1,23 @@
 from datetime import datetime, timedelta
 import os
-
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.utils.translation import gettext_lazy
+from django.utils import timezone
 from uuid import uuid4
-
+from rest_framework.response import Response
 from .manager import CustomUserManager
 
 # Create your models here.
 class CustomUser(AbstractBaseUser, PermissionsMixin):
     '''Custom user model'''
-    
-    def upload_image(model, filename):
-        '''Function to upload image and save in a folder for each object'''
-        
-        extension = filename.split('.')[-1]
-        return os.path.join('user', str(model.id), f'user_pic.{extension}')
 
     id = models.UUIDField(default=uuid4, primary_key=True)
     email = models.EmailField(gettext_lazy('email address'), unique=True, null=False)
-    # username = models.CharField(unique=True, null=False, default='')
     first_name = models.CharField(max_length=128, null=False)
     last_name = models.CharField(max_length=128, null=False)
-    profile_pic = models.ImageField(default='user/default.png', upload_to=upload_image, null=True)
-    phone_number = models.CharField(max_length=15, null=True)
+    phone_number = models.CharField(max_length=15, null=False, default='')
+    referral_code = models.CharField(max_length=50, blank=True, null=True)
     is_verified = models.BooleanField(default=False)
     
     is_active = models.BooleanField(default=True)
@@ -33,6 +26,23 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
+    groups = models.ManyToManyField(
+        'auth.Group',
+        related_name='customuser_set',
+        related_query_name='customuser',
+        blank=True,
+        verbose_name='groups',
+        help_text='The groups this user belongs to. A user will get all permissions granted to each of their groups.'
+    )
+    user_permissions = models.ManyToManyField(
+        'auth.Permission',
+        related_name='customuser_set',
+        related_query_name='customuser',
+        blank=True,
+        verbose_name='user permissions',
+        help_text='Specific permissions for this user.'
+    )
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
@@ -41,7 +51,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.email
-    
+
 
 class OTP(models.Model):
     '''Model to store user OTP at sign up'''
@@ -51,25 +61,24 @@ class OTP(models.Model):
     
     otp_types = [
         (SIGNUP, 'Sign Up'),
-        (PASSWORD_RESET, 'Password Reset')
+        (PASSWORD_RESET, 'PasswordReset'),
     ]
     
     email = models.EmailField(null=False)
-    otp = models.CharField(max_length=6, null=False)
-    otp_type = models.CharField(choices=otp_types, default=SIGNUP, null=False) 
+    otp = models.CharField(max_length=4, null=False)
+    otp_type = models.CharField(max_length=13, choices=otp_types, default=SIGNUP, null=False) 
     created_at = models.DateTimeField(auto_now_add=True)
     expires_at = models.DateTimeField()
-    
     def __str__(self):
         return f'{self.email} | {self.otp} | {self.otp_type}'
     
     def save(self, *args, **kwargs):
         if not self.expires_at:
-            self.expires_at = datetime.now() + timedelta(minutes=10)
+            self.expires_at = timezone.now() + timedelta(minutes=10)
         super().save(*args, **kwargs)
         
     def is_expired(self):
-        return self.expires_at.replace(tzinfo=None) < datetime.now().replace(tzinfo=None)
+        return self.expires_at.replace(tzinfo=None) < timezone.now().replace(tzinfo=None)
     
     class Meta:
         ordering = ['-created_at']
