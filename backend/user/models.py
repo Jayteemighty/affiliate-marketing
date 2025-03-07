@@ -26,6 +26,23 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
+    # New fields from Mongoose schema
+    today_sales = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    overall_sales = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    today_earnings = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    overall_earnings = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    today_affiliate_earnings = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    overall_affiliate_earnings = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    
+    # Affiliate relationship (Self-referencing foreign key)
+    affiliate_id = models.ForeignKey(
+        'self', 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        blank=True, 
+        related_name='referred_users'
+    )
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
