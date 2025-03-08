@@ -15,6 +15,7 @@ from .serializers import PaymentSerializer, WithdrawalRequestSerializer, Custome
 from affiliates.models import Referral, Sale, Commission
 from courses.models import Course
 
+
 class InitiatePaymentView(APIView):
     """API to initiate a Paystack payment."""
     permission_classes = [IsAuthenticated]
@@ -34,10 +35,17 @@ class InitiatePaymentView(APIView):
         paystack_url = "https://api.paystack.co/transaction/initialize"
         secret_key = settings.PAYSTACK_SECRET_KEY
 
+        # Define the callback URL (backend API endpoint)
+        callback_url = f"{settings.BACKEND_URL}/api/payment/callback/"
+
+        # Define the redirect URL (frontend generic "payment completed" page)
+        redirect_url = f"{settings.FRONTEND_URL}/api/payment/callback/"  # Frontend page to handle payment status
+
         payload = {
             "email": user.email,
             "amount": int(amount * 100),  # Convert to kobo
-            "callback_url": f"{settings.FRONTEND_URL}/payment/callback/",  # Frontend callback URL
+            "callback_url": callback_url,  # Backend callback URL
+            "redirect_url": redirect_url,  # Frontend redirect URL
             "metadata": {
                 "course_id": course.id,
                 "referred_user_email": referred_user_email  # Track affiliate referral
