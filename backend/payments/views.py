@@ -1,71 +1,47 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework import status
 from django.conf import settings
-from .models import Payment, WithdrawalRequest, Withdrawal
-from .serializers import PaymentSerializer, WithdrawalRequestSerializer, WithdrawalSerializer
-import uuid
-import requests
-import random
-import string
-from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from django.db.models import Sum
-from datetime import timedelta
-from rest_framework import generics
-from django.http import JsonResponse
-from django.utils import timezone
-from django.http import HttpResponse
+import requests
+from django.shortcuts import get_object_or_404
 from django.http import HttpResponseRedirect
 from decimal import Decimal
-from .models import Payment, CustomerAccount, Transaction
-import logging
+from rest_framework import generics
+from affiliates.models import Affiliate
+from .models import Payment, WithdrawalRequest, CustomerAccount, Transaction
+from .serializers import PaymentSerializer, WithdrawalRequestSerializer, CustomerAccountSerializer
+from affiliates.models import Referral, Sale, Commission
+from courses.models import Course
 
-# Configure the logger
-logger = logging.getLogger(__name__)
-
-class PaymentListView(generics.ListAPIView):
-    """ Endpoint to get all payment details. """
-    
-    queryset = Payment.objects.all()
-    serializer_class = PaymentSerializer
-    permission_classes = [IsAdminUser]
-        
-
-class TotalPaymentView(APIView):
-    """ Endpoint to get the total amount of successful payments. """
-    
-    permission_classes = [IsAdminUser]
-
-    def get(self, request):
-        total_payment = Payment.objects.filter(status='successful').aggregate(total=Sum('amount'))['total'] or 0.00
-        return Response({"total_payment": total_payment})
-
-class ListUserPayments(generics.ListAPIView):
-    serializer_class = PaymentSerializer
-    permission_classes = [IsAuthenticated]
-
-    def get_queryset(self):
-        user = self.request.user
-        return Payment.objects.filter(user=user)
-
-class InitiatePaystackPayment(APIView):
+class InitiatePaymentView(APIView):
+    """API to initiate a Paystack payment."""
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
         user = request.user
-        amount = request.data.get('amount')
+        course_id = request.data.get('course_id')
+        referred_user_email = request.data.get('referred_user_email')  # Optional: For affiliate tracking
 
-        if not amount or float(amount) <= 0:
-            return Response({'error': 'Invalid amount'}, status=400)
+        if not course_id:
+            return Response({'error': 'Course ID is required'}, status=status.HTTP_400_BAD_REQUEST)
 
+        course = get_object_or_404(Course, id=course_id)
+        amount = course.price
+
+        # Initialize Paystack payment
         paystack_url = "https://api.paystack.co/transaction/initialize"
         secret_key = settings.PAYSTACK_SECRET_KEY
 
         payload = {
             "email": user.email,
-            "amount": int(float(amount) * 100),  # Convert amount to kobo
-            "callback_url": f"http://127.0.0.1:8000/api/v1/payment/paystack/callback",  # Frontend success page
+            "amount": int(amount * 100),  # Convert to kobo
+            "callback_url": f"{settings.FRONTEND_URL}/payment/callback/",  # Frontend callback URL
+            "metadata": {
+                "course_id": course.id,
+                "referred_user_email": referred_user_email  # Track affiliate referral
+            }
         }
 
         headers = {
@@ -77,33 +53,36 @@ class InitiatePaystackPayment(APIView):
             response = requests.post(paystack_url, json=payload, headers=headers)
             response_data = response.json()
 
-            # Store the reference Paystack returns
-            paystack_reference = response_data.get("data", {}).get("reference")
+            if response_data.get('status'):
+                # Save payment record
+                payment = Payment.objects.create(
+                    user=user,
+                    amount=amount,
+                    reference=response_data['data']['reference'],
+                    authorization_url=response_data['data']['authorization_url'],
+                    status='pending'
+                )
 
-            Payment.objects.create(
-                user=user,
-                amount=amount,
-                reference=paystack_reference,
-                status="pending"
-            )
-
-            return Response({
-                "status": "success",
-                "message": "Payment initialized",
-                "data": response_data
-            }, status=200)
+                return Response({
+                    'status': 'success',
+                    'authorization_url': response_data['data']['authorization_url']
+                }, status=status.HTTP_200_OK)
+            else:
+                return Response({'error': 'Payment initiation failed'}, status=status.HTTP_400_BAD_REQUEST)
 
         except requests.exceptions.RequestException:
-            return Response({'error': 'Payment initiation failed'}, status=500)
+            return Response({'error': 'Payment initiation failed'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-class PaystackPaymentCallback(APIView):
+class PaymentCallbackView(APIView):
+    """API to handle Paystack payment callback."""
     def get(self, request):
         reference = request.GET.get('reference')
 
         if not reference:
-            return Response({'error': 'Reference not provided'}, status=400)
+            return Response({'error': 'Reference not provided'}, status=status.HTTP_400_BAD_REQUEST)
 
+        # Verify payment with Paystack
         paystack_url = f"https://api.paystack.co/transaction/verify/{reference}"
         secret_key = settings.PAYSTACK_SECRET_KEY
 
@@ -116,141 +95,117 @@ class PaystackPaymentCallback(APIView):
             response = requests.get(paystack_url, headers=headers)
             response_data = response.json()
 
-            if response_data.get('status') and response_data.get('data', {}).get('status') == 'success':
-                try:
-                    payment = Payment.objects.get(reference=reference)
-                    payment.status = 'successful'
-                    payment.save()
+            if response_data.get('status') and response_data['data']['status'] == 'success':
+                payment = Payment.objects.get(reference=reference)
+                payment.status = 'completed'
+                payment.save()
 
-                    # Update user account balance
-                    account, _ = CustomerAccount.objects.get_or_create(user=payment.user)
-                    account.balance += Decimal(str(payment.amount))
-                    account.save()
+                # Update user account balance
+                account, _ = CustomerAccount.objects.get_or_create(user=payment.user)
+                account.balance += payment.amount
+                account.save()
 
-                    # Add transaction entry
-                    Transaction.objects.create(
-                        user=payment.user,
-                        amount=payment.amount,
-                        status='successful'
-                    )
+                # Handle affiliate commission (if applicable)
+                metadata = response_data['data']['metadata']
+                referred_user_email = metadata.get('referred_user_email')
+                course_id = metadata.get('course_id')
 
-                    # Redirect to frontend success page
-                    return HttpResponseRedirect(f"http://127.0.0.1:8000/api/v1/payment/success-dummy")
+                if referred_user_email and course_id:
+                    course = Course.objects.get(id=course_id)
+                    commission_rate = Commission.objects.get(course=course).rate
 
-                except Payment.DoesNotExist:
-                    return Response({'error': 'Payment not found'}, status=404)
+                    # Find the affiliate who made the referral
+                    referral = Referral.objects.filter(
+                        course=course,
+                        referred_user_email=referred_user_email
+                    ).first()
 
+                    if referral:
+                        affiliate = referral.affiliate
+                        commission_amount = payment.amount * commission_rate
+
+                        # Update affiliate earnings
+                        affiliate.overall_affiliate_earnings += commission_amount
+                        affiliate.available_affiliate_earnings += commission_amount
+                        affiliate.save()
+
+                        # Record the sale
+                        Sale.objects.create(
+                            vendor=affiliate.user,
+                            amount=payment.amount,
+                            commission=commission_amount,
+                            referral=referral
+                        )
+
+                # Redirect to frontend success page
+                return HttpResponseRedirect("http://127.0.0.1:8000/api/v1/payment/success-dummy")
             else:
-                # Mark payment as failed
-                try:
-                    payment = Payment.objects.get(reference=reference)
-                    payment.status = 'failed'
-                    payment.save()
-
-                    # Add transaction entry
-                    Transaction.objects.create(
-                        user=payment.user,
-                        amount=payment.amount,
-                        status='failed'
-                    )
-
-                except Payment.DoesNotExist:
-                    return Response({'error': 'Payment not found'}, status=404)
+                payment = Payment.objects.get(reference=reference)
+                payment.status = 'failed'
+                payment.save()
 
                 # Redirect to frontend failure page
-                return HttpResponseRedirect(f"http://127.0.0.1:8000/api/v1/payment/failure-dummy")
+                return HttpResponseRedirect("http://127.0.0.1:8000/api/v1/payment/failure-dummy")
 
         except requests.exceptions.RequestException:
-            return Response({'error': 'Failed to verify payment status'}, status=500)
+            return Response({'error': 'Failed to verify payment'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class WithdrawalRequestView(generics.CreateAPIView):
+    """API for affiliates to request withdrawals."""
+    permission_classes = [IsAuthenticated]
+    serializer_class = WithdrawalRequestSerializer
+
+    def perform_create(self, serializer):
+        user = self.request.user
+        affiliate = get_object_or_404(Affiliate, user=user)
+        serializer.save(user=user, amount=affiliate.available_affiliate_earnings)
 
 
 class DummySuccessPageView(APIView):
+    """Dummy success page for testing."""
     def get(self, request):
-        return HttpResponse("Payment was successful. Frontend is under construction.")
-        
+        return Response({"message": "Payment was successful. Frontend is under construction."})
+
+
 class DummyFailurePageView(APIView):
+    """Dummy failure page for testing."""
     def get(self, request):
-        return HttpResponse("Payment failed. Frontend is under construction.")
+        return Response({"message": "Payment failed. Frontend is under construction."})
 
 
-# class WithdrawFunds(APIView):
-#     permission_classes = [IsAuthenticated]
+class PaymentListView(generics.ListAPIView):
+    """API to list all payments."""
+    permission_classes = [IsAuthenticated]
+    serializer_class = PaymentSerializer
 
-#     def post(self, request):
-#         user = request.user
-#         account_number = request.data.get('account_number')
-#         bank_code = request.data.get('bank_code')
-#         amount = request.data.get('amount')
-#         narration = request.data.get('narration', 'Withdrawal from app account')
-#         account_name = request.data.get('account_name')  # Add account name
-#         sender_name = request.data.get('sender_name', 'Your App Name')  # Add sender name
+    def get_queryset(self):
+        return Payment.objects.filter(user=self.request.user)
 
-#         if not account_number or not bank_code or not amount or Decimal(amount) <= 0:
-#             return Response({'error': 'Invalid data provided'}, status=status.HTTP_400_BAD_REQUEST)
 
-#         try:
-#             # Check if the user has sufficient balance
-#             account = CustomerAccount.objects.get(user=user)
-#             if account.balance < Decimal(amount):
-#                 return Response({'error': 'Insufficient balance'}, status=status.HTTP_400_BAD_REQUEST)
+class CustomerAccountView(generics.RetrieveAPIView):
+    """API to retrieve a user's account balance."""
+    permission_classes = [IsAuthenticated]
+    serializer_class = CustomerAccountSerializer
 
-#             # Withdraw funds using Nomba
-#             response = NombaPaymentService.withdraw_funds(
-#                 account_number=account_number,
-#                 bank_code=bank_code,
-#                 amount=Decimal(amount),
-#                 narration=narration,
-#                 account_name=account_name,  # Pass account name
-#                 sender_name=sender_name  # Pass sender name
-#             )
+    def get_object(self):
+        return get_object_or_404(CustomerAccount, user=self.request.user)
+        
 
-#             if response.get('code') == "202":  # Check for processing status
-#                 # Get the transaction reference
-#                 transaction_ref = response.get("data", {}).get("meta", {}).get("merchantTxRef")
+class TotalPaymentView(APIView):
+    """ Endpoint to get the total amount of successful payments. """
+    
+    permission_classes = [IsAdminUser]
 
-#                 # Poll the transaction status until it is completed
-#                 max_attempts = 10  # Maximum number of attempts
-#                 delay = 5  # Delay between attempts (in seconds)
+    def get(self, request):
+        total_payment = Payment.objects.filter(status='successful').aggregate(total=Sum('amount'))['total'] or 0.00
+        return Response({"total_payment": total_payment})
 
-#                 for attempt in range(max_attempts):
-#                     time.sleep(delay)  # Wait before checking the status
-#                     status_response = NombaPaymentService.check_transaction_status(transaction_ref)
+class ListUserPayments(generics.ListAPIView):
+    """API to list a user payments."""
+    serializer_class = PaymentSerializer
+    permission_classes = [IsAuthenticated]
 
-#                     if status_response.get("data", {}).get("status") == "SUCCESS":
-#                         # Deduct the amount from the user's balance
-#                         account.balance -= Decimal(amount)
-#                         account.save()
-
-#                         # Add transaction entry
-#                         Transaction.objects.create(
-#                             user=user,
-#                             amount=amount,
-#                             status='successful'
-#                         )
-
-#                         return Response({
-#                             "status": "success",
-#                             "message": "Withdrawal successful",
-#                             "data": status_response.get("data", {})
-#                         }, status=status.HTTP_200_OK)
-
-#                     elif status_response.get("data", {}).get("status") == "FAILED":
-#                         return Response({
-#                             "status": "failed",
-#                             "message": "Withdrawal failed",
-#                             "data": status_response.get("data", {})
-#                         }, status=status.HTTP_400_BAD_REQUEST)
-
-#                 # If the transaction is still processing after max attempts
-#                 return Response({
-#                     "status": "processing",
-#                     "message": "Withdrawal is still processing. Please check again later.",
-#                     "data": response.get("data", {})
-#                 }, status=status.HTTP_200_OK)
-
-#             else:
-#                 return Response({'error': 'Withdrawal failed', "details": response}, status=status.HTTP_400_BAD_REQUEST)
-
-#         except Exception as e:
-#             logger.error(f"Error withdrawing funds: {str(e)}")
-#             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    def get_queryset(self):
+        user = self.request.user
+        return Payment.objects.filter(user=user)

@@ -23,6 +23,7 @@ class WithdrawalRequest(models.Model):
     def __str__(self):
         return f"Withdrawal of ${self.amount} by {self.user.email} - {self.status}"
 
+
 class Payment(models.Model):
     """Model for tracking user payments."""
 
@@ -37,7 +38,6 @@ class Payment(models.Model):
     reference = models.CharField(max_length=100, unique=True)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
     authorization_url = models.URLField()
-
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -57,12 +57,14 @@ class Withdrawal(models.Model):
     def __str__(self):
         return f"Withdrawal of ${self.amount} by {self.user.email} - {self.status}"
 
+
 class CustomerAccount(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="account")
     balance = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
 
     def __str__(self):
         return f'{self.user.email} - {self.balance}'
+
 
 class Transaction(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='transactions')
@@ -71,4 +73,4 @@ class Transaction(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f'{self.user.email} - {self.amount} - {self.status}' 
+        return f'{self.user.email} - {self.amount} - {self.status}'

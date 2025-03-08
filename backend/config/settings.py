@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 import os
 from pathlib import Path
-import dj_database_url
+# import dj_database_url
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -181,12 +181,8 @@ CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_METHODS = ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"]
 CORS_ALLOW_HEADERS = ["accept", "accept-language", "content-type", "authorization", "origin", "x-requested-with"]
 
-from django.db.backends.signals import connection_created
-from django.db import connection
-
-def activate_foreign_keys(sender, connection, **kwargs):
-    if connection.vendor == 'sqlite':
-        cursor = connection.cursor()
-        cursor.execute("PRAGMA foreign_keys = ON;")
-
-connection_created.connect(activate_foreign_keys)
+# Payment Env
+BACKEND_URL = os.getenv('BACKEND_URL', default='http://localhost:8000')
+FRONTEND_URL = os.getenv('FRONTEND_URL', default='http://localhost:3000')
+PAYSTACK_SECRET_KEY = os.getenv('paystack-secret-key')
+PAYSTACK_PUBLIC_KEY = os.getenv('paystack-public-key')
