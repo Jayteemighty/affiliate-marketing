@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.conf import settings
 
 User = get_user_model()
 
@@ -12,7 +13,7 @@ class WithdrawalRequest(models.Model):
         ('Rejected', 'Rejected'),
     ]
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="withdrawals")
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="withdrawals")
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     bank_name = models.CharField(max_length=255)
     account_number = models.CharField(max_length=50)
@@ -31,7 +32,7 @@ class Payment(models.Model):
         ('failed', 'Failed'),
     ]
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="payments")
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="payments")
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     reference = models.CharField(max_length=100, unique=True)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
@@ -46,7 +47,7 @@ class Payment(models.Model):
 class Withdrawal(models.Model):
     """Model for completed withdrawals."""
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="completed_withdrawals")
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="completed_withdrawals")
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     bank_name = models.CharField(max_length=255)
     account_number = models.CharField(max_length=50)
@@ -55,3 +56,19 @@ class Withdrawal(models.Model):
 
     def __str__(self):
         return f"Withdrawal of ${self.amount} by {self.user.email} - {self.status}"
+
+class CustomerAccount(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="account")
+    balance = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+
+    def __str__(self):
+        return f'{self.user.email} - {self.balance}'
+
+class Transaction(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='transactions')
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    status = models.CharField(max_length=20, choices=Payment.STATUS_CHOICES)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'{self.user.email} - {self.amount} - {self.status}' 
