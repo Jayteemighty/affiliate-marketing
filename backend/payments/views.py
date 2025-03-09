@@ -24,7 +24,7 @@ class InitiatePaymentView(APIView):
     def post(self, request):
         user = request.user
         course_id = request.data.get('course_id')
-        referred_user_email = request.data.get('referred_user_email')  # Optional: For affiliate tracking
+        affiliate_token = request.data.get('affiliate_token')  # Unique token from the affiliate link
 
         if not course_id:
             return Response({'error': 'Course ID is required'}, status=status.HTTP_400_BAD_REQUEST)
@@ -40,17 +40,21 @@ class InitiatePaymentView(APIView):
         callback_url = f"{settings.BACKEND_URL}/api/payment/callback/"
 
         # Define the redirect URL (frontend generic "payment completed" page)
-        redirect_url = f"{settings.FRONTEND_URL}/api/payment/callback/"  # Frontend page to handle payment status
+        redirect_url = f"{settings.FRONTEND_URL}/payment-completed/"  # Frontend page to handle payment status
+
+        # Prepare metadata for affiliate tracking
+        metadata = {
+            "course_id": course.id,
+            "affiliate_token": affiliate_token,  # Include the affiliate token
+            "referred_user_email": user.email  # Include the referred user's email
+        }
 
         payload = {
             "email": user.email,
             "amount": int(amount * 100),  # Convert to kobo
             "callback_url": callback_url,  # Backend callback URL
             "redirect_url": redirect_url,  # Frontend redirect URL
-            "metadata": {
-                "course_id": course.id,
-                "referred_user_email": referred_user_email  # Track affiliate referral
-            }
+            "metadata": metadata  # Include metadata for affiliate tracking
         }
 
         headers = {
@@ -83,8 +87,6 @@ class InitiatePaymentView(APIView):
             return Response({'error': 'Payment initiation failed'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-from decimal import Decimal
-
 class PaymentCallbackView(APIView):
     """API to handle Paystack payment callback."""
     def get(self, request):
@@ -113,40 +115,50 @@ class PaymentCallbackView(APIView):
 
                 # Update user account balance
                 account, _ = CustomerAccount.objects.get_or_create(user=payment.user)
-                account.balance += Decimal(str(payment.amount))  # Convert payment.amount to Decimal
+                account.balance += Decimal(str(payment.amount))
                 account.save()
 
                 # Handle affiliate commission (if applicable)
                 metadata = response_data['data']['metadata']
-                referred_user_email = metadata.get('referred_user_email')
+                affiliate_token = metadata.get('affiliate_token')
                 course_id = metadata.get('course_id')
+                referred_user_email = metadata.get('referred_user_email')
 
-                if referred_user_email and course_id:
-                    course = Course.objects.get(id=course_id)
+                if affiliate_token and course_id and referred_user_email:
+                    # Find the affiliate course using the unique token
+                    affiliate_course = get_object_or_404(AffiliateCourse, unique_token=affiliate_token)
+                    affiliate = affiliate_course.affiliate
+                    course = affiliate_course.course
+
+                    # Get the commission rate for the course
                     commission_rate = Commission.objects.get(course=course).rate
 
-                    # Find the affiliate who made the referral
-                    referral = Referral.objects.filter(
+                    # Calculate the commission amount
+                    commission_amount = Decimal(str(payment.amount)) * commission_rate
+
+                    # Create a referral record and mark it as completed
+                    referral = Referral.objects.create(
                         course=course,
-                        referred_user_email=referred_user_email
-                    ).first()
+                        affiliate=affiliate,
+                        referred_user_email=referred_user_email,
+                        is_completed=True  # Mark the referral as completed
+                    )
 
-                    if referral:
-                        affiliate = referral.affiliate
-                        commission_amount = Decimal(str(payment.amount)) * commission_rate  # Convert to Decimal
+                    # Update affiliate earnings and sales
+                    affiliate.overall_sales += 1
+                    affiliate.today_sales += 1
+                    affiliate.overall_affiliate_earnings += commission_amount
+                    affiliate.today_affiliate_earnings += commission_amount
+                    affiliate.available_affiliate_earnings += commission_amount
+                    affiliate.save()
 
-                        # Update affiliate earnings
-                        affiliate.overall_affiliate_earnings += commission_amount
-                        affiliate.available_affiliate_earnings += commission_amount
-                        affiliate.save()
-
-                        # Record the sale
-                        Sale.objects.create(
-                            vendor=affiliate.user,
-                            amount=payment.amount,
-                            commission=commission_amount,
-                            referral=referral
-                        )
+                    # Record the sale
+                    Sale.objects.create(
+                        vendor=affiliate.user,
+                        amount=payment.amount,
+                        commission=commission_amount,
+                        referral=referral  # Link to the referral
+                    )
 
                 # Redirect to frontend success page
                 return HttpResponseRedirect("http://127.0.0.1:8000/api/v1/payment/success-dummy")

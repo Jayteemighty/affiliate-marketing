@@ -1,10 +1,11 @@
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from .models import Affiliate, AffiliateCourse, Referral, Sale
+from .models import Affiliate, AffiliateCourse, Referral, Sale, Commission
 from .serializers import AffiliateSerializer, AffiliateCourseSerializer, ReferralSerializer, SaleSerializer
 from courses.models import Course
 from django.shortcuts import get_object_or_404
+from decimal import Decimal
 
 class AffiliateDashboardView(generics.RetrieveAPIView):
     """API for affiliates to view their dashboard."""
@@ -29,20 +30,19 @@ class GenerateAffiliateLinkView(generics.CreateAPIView):
         course = get_object_or_404(Course, id=course_id)
         affiliate, _ = Affiliate.objects.get_or_create(user=user)
 
-        # Generate a unique affiliate link
-        affiliate_link = f"https://profitplus.com.ng/course/{course.id}/affiliate/{affiliate.id}"
-
-        # Save the affiliate link
+        # Generate a unique affiliate link using the unique_token
         affiliate_course, created = AffiliateCourse.objects.get_or_create(
             affiliate=affiliate,
-            course=course,
-            defaults={'affiliate_link': affiliate_link}
+            course=course
         )
 
-        if not created:
-            return Response({'affiliate_link': affiliate_course.affiliate_link}, status=status.HTTP_200_OK)
+        affiliate_link = f"https://profitplus.com.ng/course/{affiliate_course.unique_token}"
 
-        return Response({'affiliate_link': affiliate_course.affiliate_link}, status=status.HTTP_201_CREATED)
+        # Update the affiliate_link field
+        affiliate_course.affiliate_link = affiliate_link
+        affiliate_course.save()
+
+        return Response({'affiliate_link': affiliate_link}, status=status.HTTP_201_CREATED)
 
 
 class TrackReferralView(generics.CreateAPIView):

@@ -1,3 +1,4 @@
+import uuid
 from django.db import models
 from django.contrib.auth import get_user_model
 from courses.models import Course
@@ -26,6 +27,7 @@ class AffiliateCourse(models.Model):
     affiliate = models.ForeignKey(Affiliate, on_delete=models.CASCADE, related_name="courses")
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="affiliate_courses")
     affiliate_link = models.URLField(unique=True)  # Unique link for tracking
+    unique_token = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)  # Unique token for the link
 
     def __str__(self):
         return f"{self.affiliate.user.email} - {self.course.title}"
