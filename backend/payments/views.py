@@ -2,6 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework import status
+from rest_framework import serializers, generics, permissions
 from django.conf import settings
 from django.db.models import Sum
 import requests
@@ -82,6 +83,8 @@ class InitiatePaymentView(APIView):
             return Response({'error': 'Payment initiation failed'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+from decimal import Decimal
+
 class PaymentCallbackView(APIView):
     """API to handle Paystack payment callback."""
     def get(self, request):
@@ -110,7 +113,7 @@ class PaymentCallbackView(APIView):
 
                 # Update user account balance
                 account, _ = CustomerAccount.objects.get_or_create(user=payment.user)
-                account.balance += payment.amount
+                account.balance += Decimal(str(payment.amount))  # Convert payment.amount to Decimal
                 account.save()
 
                 # Handle affiliate commission (if applicable)
@@ -130,7 +133,7 @@ class PaymentCallbackView(APIView):
 
                     if referral:
                         affiliate = referral.affiliate
-                        commission_amount = payment.amount * commission_rate
+                        commission_amount = Decimal(str(payment.amount)) * commission_rate  # Convert to Decimal
 
                         # Update affiliate earnings
                         affiliate.overall_affiliate_earnings += commission_amount
@@ -167,7 +170,14 @@ class WithdrawalRequestView(generics.CreateAPIView):
     def perform_create(self, serializer):
         user = self.request.user
         affiliate = get_object_or_404(Affiliate, user=user)
-        serializer.save(user=user, amount=affiliate.available_affiliate_earnings)
+        
+        # Ensure the withdrawal amount does not exceed available earnings
+        amount = serializer.validated_data['amount']
+        if amount > affiliate.available_affiliate_earnings:
+            raise serializers.ValidationError({"amount": "Withdrawal amount exceeds available earnings."})
+        
+        # Automatically set the user
+        serializer.save(user=user)
 
 
 class DummySuccessPageView(APIView):

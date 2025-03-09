@@ -21,7 +21,7 @@ class CourseAdmin(admin.ModelAdmin):
 class LessonAdmin(admin.ModelAdmin):
     """Admin interface for the Lesson model."""
     
-    list_display = ('title', 'course', 'created_at')
+    list_display = ('title', 'course')
     list_filter = ('course',)
     search_fields = ('title', 'content')
 

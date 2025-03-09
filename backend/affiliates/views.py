@@ -30,7 +30,7 @@ class GenerateAffiliateLinkView(generics.CreateAPIView):
         affiliate, _ = Affiliate.objects.get_or_create(user=user)
 
         # Generate a unique affiliate link
-        affiliate_link = f"https://yourapp.com/course/{course.id}/affiliate/{affiliate.id}"
+        affiliate_link = f"https://profitplus.com.ng/course/{course.id}/affiliate/{affiliate.id}"
 
         # Save the affiliate link
         affiliate_course, created = AffiliateCourse.objects.get_or_create(

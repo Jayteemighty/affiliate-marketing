@@ -19,6 +19,9 @@ urlpatterns = [
     
     # App urls
     path('api/user/', include('user.urls')),
+    path('api/payment/', include('payments.urls')),
+    path('api/course/', include('courses.urls')),
+    path('api/affiliate/', include('affiliates.urls')),
 ]
 
 urlpatterns += staticfiles_urlpatterns()

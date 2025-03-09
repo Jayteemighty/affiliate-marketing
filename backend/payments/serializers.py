@@ -10,6 +10,7 @@ class WithdrawalRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = WithdrawalRequest
         fields = '__all__'
+        read_only_fields = ['user', 'status', 'created_at'] 
 
 class CustomerAccountSerializer(serializers.ModelSerializer):
     class Meta:

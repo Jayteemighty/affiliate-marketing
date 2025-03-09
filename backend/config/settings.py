@@ -43,6 +43,9 @@ INSTALLED_APPS = [
     
     # Apps
     "user",
+    "payments",
+    "courses",
+    "affiliates",
     
     #3rd party apps
     'corsheaders',

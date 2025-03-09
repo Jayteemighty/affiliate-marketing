@@ -3,7 +3,7 @@ from . import views
 
 urlpatterns = [
     # Payment APIs
-    path('initiate-payment/', views.InitiatePaymentView.as_view(), name='initiate-payment'),
+    path('initiate/', views.InitiatePaymentView.as_view(), name='initiate-payment'),
     path('callback/', views.PaymentCallbackView.as_view(), name='payment-callback'),
     path('payments/', views.PaymentListView.as_view(), name='payment-list'),
     path('total-payments/', views.TotalPaymentView.as_view(), name='total-payments'),
