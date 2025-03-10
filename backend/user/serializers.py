@@ -3,10 +3,63 @@ from django.contrib.auth.password_validation import validate_password
 
 from rest_framework import serializers, status
 from rest_framework.authtoken.models import Token
-
+from .util import Util
 from .models import OTP
 
 User = get_user_model()
+
+from django.core.mail import send_mail
+from django.conf import settings
+
+class CreatedAccountSerializer(serializers.ModelSerializer):
+    ''' Serializer to create new user '''
+
+    password2 = serializers.CharField(write_only=True)
+
+    class Meta:
+        model = User
+        fields = ['email', 'password', 'password2', 'first_name', 'last_name', 'phone_number']
+        read_only_fields = ['id']        
+        extra_kwargs = {
+            'password': {'write_only': True}
+        }
+
+    def validate(self, data):
+        '''Account creation validation function'''
+
+        if data['password'] != data['password2']:
+            raise serializers.ValidationError({'error': 'Your passwords do not match'}, code=status.HTTP_400_BAD_REQUEST)
+        
+        if User.objects.filter(email=data['email']).exists():
+            raise serializers.ValidationError({'error': 'Email already exists'}, code=status.HTTP_400_BAD_REQUEST)
+        
+        validate_password(data['password'])
+        
+        return data
+    
+    def create(self, validated_data):
+        '''Account creation function'''
+        
+        password = validated_data.pop('password2')
+        account = User.objects.create(**validated_data)
+        account.set_password(password)
+        account.save()
+
+        # Create authentication token
+        Token.objects.create(user=account)
+        
+        # Send welcome email
+        self.send_welcome_email(account)
+        
+        return account
+
+    def send_welcome_email(self, user):
+        '''Send a welcome email after account creation'''
+        subject = "Welcome to Our Platform!"
+        body = f"Hi {user.first_name},\n\nWelcome to our platform! We're excited to have you on board."
+        Util.send_email(user.email, subject, body, is_html=False)
+
+
 
 class UserSerializer(serializers.ModelSerializer):
     '''Serializer to get and update a user's details.'''

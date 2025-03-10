@@ -5,6 +5,7 @@ app_name = 'user'
 
 urlpatterns = [
     path('account/register/', views.RegisterView.as_view(), name='register'),
+    path('account/registerd/', views.RegisteredView.as_view(), name='register'),
     path('account/login/', views.LoginView.as_view(), name='login'),
     path('account/verify/', views.VerifyAccountView.as_view(), name='verify-account'),
     path('account/verify/resend/', views.ResendVerificationEmailView.as_view(), name='resend-verification'),

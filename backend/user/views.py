@@ -55,7 +55,23 @@ def send_password_reset_email(email):
 
 # --------------------------------------------------------------------------
 # --------------------------------------------------------------------------
+
+class RegisteredView(generics.GenericAPIView):
+    '''View to register users'''
+
+    serializer_class = serializers.CreatedAccountSerializer
+    permission_classes = [AllowAny]
+    queryset = User.objects.all()
     
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response({'message': 'Account created successfully. Check your email for a welcome message.'}, status=status.HTTP_201_CREATED)
+
+
+
 class RegisterView(generics.GenericAPIView):
     '''View to register users'''
 
