@@ -201,7 +201,7 @@ class UserDetailsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'first_name', 'last_name', 'email', 'profile_pic', 'phone_number', 'role']
+        fields = ['id', 'first_name', 'last_name', 'email', 'phone_number']
         read_only_fields = ['id', 'email']        
     
     def update(self, instance, validated_data):
