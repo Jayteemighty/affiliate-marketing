@@ -26,7 +26,7 @@ class CustomUserManager(BaseUserManager):
     def create_superuser(self, email, password, **extras):
         
         # set default values for is_active, is_staff, is_superuser
-        extras.setdefault('is_verified', True)
+        # extras.setdefault('is_verified', True)
         extras.setdefault('is_active', True)
         extras.setdefault('is_staff', True)
         extras.setdefault('is_superuser', True)

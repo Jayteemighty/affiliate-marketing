@@ -10,7 +10,7 @@ if admin.site.is_registered(CustomUser):
 
 class UserAdmin(BaseUserAdmin):
     fieldsets = (
-        (None, {'fields': ('email', 'password', 'first_name', 'username',
+        (None, {'fields': ('email', 'password', 'first_name',
          'last_name', 'phone_number')}),
         (_('Permissions'), {
             'fields': ('is_active', 'is_staff', 'is_superuser', 'is_verified'),
@@ -25,7 +25,7 @@ class UserAdmin(BaseUserAdmin):
     )
     form = UserChangeForm
     add_form = UserCreationForm
-    list_display = ('email', 'id', 'first_name', 'last_name', 'phone_number', 'is_active', 'is_verified')
+    list_display = ('email', 'id', 'first_name', 'last_name', 'phone_number', 'is_active')
     list_filter = ('is_staff', 'is_superuser', 'is_active', 'groups')
     search_fields = ('email', 'first_name', 'last_name')
     ordering = ('email',)

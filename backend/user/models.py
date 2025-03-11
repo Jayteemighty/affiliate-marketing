@@ -18,7 +18,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     last_name = models.CharField(max_length=128, null=False)
     phone_number = models.CharField(max_length=15, null=False, default='')
     referral_code = models.CharField(max_length=50, blank=True, null=True)
-    is_verified = models.BooleanField(default=False)
+    # is_verified = models.BooleanField(default=False)
     
     is_active = models.BooleanField(default=True)
     is_superuser = models.BooleanField(default=False)
