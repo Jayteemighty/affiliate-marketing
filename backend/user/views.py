@@ -52,6 +52,86 @@ def send_password_reset_email(email):
     
     Util.send_email(user.email, subject, body, is_html=False)
 
+def send_welcome_email(email):
+        '''Send a welcome email after account creation'''
+        
+        user = User.objects.get(email=email)
+        
+        subject = "Welcome to PROFIT PLUS!"
+        html_content = f"""
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Welcome to PROFIT PLUS</title>
+          <style>
+            body {{
+              font-family: Arial, sans-serif;
+              background-color: #f4f4f4;
+              margin: 0;
+              padding: 0;
+            }}
+            .container {{
+              width: 100%;
+              max-width: 600px;
+              margin: 0 auto;
+              background-color: #ffffff;
+              padding: 20px;
+              box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            }}
+            h1 {{
+              color: #333333;
+            }}
+            p {{
+              color: #555555;
+              line-height: 1.6;
+            }}
+            .cta-button {{
+              display: inline-block;
+              padding: 10px 20px;
+              background-color: #0066cc;
+              color: #ffffff;
+              text-decoration: none;
+              border-radius: 5px;
+              font-weight: bold;
+              margin: 20px 0;
+            }}
+            .cta-button:hover {{
+              background-color: #004c99;
+            }}
+            .footer {{
+              font-size: 0.9em;
+              color: #888888;
+              text-align: center;
+              margin-top: 20px;
+              padding-top: 20px;
+              border-top: 1px solid #eeeeee;
+            }}
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <h1>Welcome to PROFIT PLUS!</h1>
+            <p>Hi {user.first_name},</p>
+            <p>We’re thrilled to have you join us! As a new affiliate with <a href="https://www.theprofitplus.com.ng/">Profit Plus</a>, you’re now part of a community dedicated to success and growth. We're here to support you in maximizing your earnings and achieving your goals.</p>
+            <p>Start exploring our platform and discover the tools and resources available to help you get the most out of your affiliate journey.</p>
+            <a href="https://www.theprofitplus.com.ng/" class="cta-button">Get Started Now</a>
+            <p>If you have any questions or need assistance, our support team is just an email away. We look forward to working with you!</p>
+            <p>Welcome aboard, and here’s to your success!</p>
+            <p>Best regards,<br>The Profit Plus Team</p>
+            <div class="footer">
+              © {datetime.datetime.now().year} Profit Plus. All rights reserved.<br>
+              <a href="https://www.theprofitplus.com.ng/" style="color: #0066cc;">Privacy Policy</a> | <a href="https://www.theprofitplus.com.ng/" style="color: #0066cc;">Terms of Service</a>
+            </div>
+          </div>
+        </body>
+        </html>
+        """
+        
+        Util.send_email(user.email, subject, html_content, is_html=True)
+
+
 
 # --------------------------------------------------------------------------
 # --------------------------------------------------------------------------
@@ -67,6 +147,16 @@ class RegisteredView(generics.GenericAPIView):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
+        
+        # Send welcome email
+        try:
+            send_welcome_email(email=serializer.data['email'])
+            
+        except Exception as e:
+            return Response({
+                'exception': f'{e}',
+                'error': 'could not send emailAn error occured. Try again later',
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return Response({'message': 'Account created successfully. Check your email for a welcome message.'}, status=status.HTTP_201_CREATED)
 

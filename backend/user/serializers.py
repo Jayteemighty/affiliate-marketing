@@ -48,16 +48,7 @@ class CreatedAccountSerializer(serializers.ModelSerializer):
         # Create authentication token
         Token.objects.create(user=account)
         
-        # Send welcome email
-        self.send_welcome_email(account)
-        
         return account
-
-    def send_welcome_email(self, user):
-        '''Send a welcome email after account creation'''
-        subject = "Welcome to Our Platform!"
-        body = f"Hi {user.first_name},\n\nWelcome to our platform! We're excited to have you on board."
-        Util.send_email(user.email, subject, body, is_html=False)
 
 
 
