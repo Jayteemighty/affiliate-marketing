@@ -178,8 +178,8 @@ class LoginSerializer(serializers.Serializer):
             raise serializers.ValidationError({'error': 'Invalid credentials'}, code=status.HTTP_400_BAD_REQUEST)
         
         # check if user is verified
-        elif not user.is_verified:
-            raise serializers.ValidationError({'error': 'Email is not verified'}, code=status.HTTP_400_BAD_REQUEST)
+        # elif not user.is_verified:
+        #     raise serializers.ValidationError({'error': 'Email is not verified'}, code=status.HTTP_400_BAD_REQUEST)
         
         elif not user.is_active:
             raise serializers.ValidationError({'error': 'This user is not active'}, code=status.HTTP_400_BAD_REQUEST)
@@ -201,8 +201,8 @@ class UserDetailsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'first_name', 'last_name', 'email', 'profile_pic', 'phone_number', 'is_verified', 'role']
-        read_only_fields = ['id', 'is_verified', 'email']        
+        fields = ['id', 'first_name', 'last_name', 'email', 'profile_pic', 'phone_number', 'role']
+        read_only_fields = ['id', 'email']        
     
     def update(self, instance, validated_data):
         '''Update details function'''

@@ -13,7 +13,7 @@ class UserAdmin(BaseUserAdmin):
         (None, {'fields': ('email', 'password', 'first_name',
          'last_name', 'phone_number')}),
         (_('Permissions'), {
-            'fields': ('is_active', 'is_staff', 'is_superuser', 'is_verified'),
+            'fields': ('is_active', 'is_staff', 'is_superuser'),
         })
     )
     model = CustomUser
