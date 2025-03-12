@@ -67,7 +67,7 @@ class GenerateAffiliateLinkView(APIView):
                 course=course
             )
 
-            affiliate_link = f"http://localhost:5173/course/{course_id}/{affiliate_course.unique_token}"
+            affiliate_link = f"https://profits-plus-tau.vercel.app/course/{course_id}/{affiliate_course.unique_token}"
             print("Generated Affiliate Link:", affiliate_link)  # Debug log
 
             # Update the affiliate_link field
