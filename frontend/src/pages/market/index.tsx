@@ -19,6 +19,7 @@ const Marketplace: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [courses, setCourses] = useState<Course[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [affiliateLink, setAffiliateLink] = useState<string | null>(null); // State to store the affiliate link
   const navigate = useNavigate();
 
   const toggleSidebar = () => {
@@ -45,22 +46,35 @@ const Marketplace: React.FC = () => {
   }, []);
 
   const handlePromote = async (courseId: number) => {
+    const token = localStorage.getItem("token");
+    console.log("Token retrieved:", token); // Debug log
+
     try {
       const response = await axios.post(
         `${BASE_URL2}/api/affiliate/generate-link/`,
         { course_id: courseId },
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            Authorization: `Token ${token}`, // Use "Token" instead of "Bearer"
           },
         }
       );
 
       const affiliateLink = response.data.affiliate_link;
+      console.log("Affiliate Link:", affiliateLink); // Debug log
+
+      setAffiliateLink(affiliateLink); // Store the affiliate link in state
       toast.success("Affiliate link generated successfully!");
-      navigator.clipboard.writeText(affiliateLink);
-      toast.info("Affiliate link copied to clipboard!");
+
+      // Copy the affiliate link to the clipboard
+      navigator.clipboard.writeText(affiliateLink).then(() => {
+        toast.info("Affiliate link copied to clipboard!");
+      }).catch((error) => {
+        console.error("Failed to copy affiliate link:", error);
+        toast.error("Failed to copy affiliate link to clipboard.");
+      });
     } catch (error) {
+      console.error("Error generating affiliate link:", error); // Debug log
       toast.error("Failed to generate affiliate link. Please try again.");
     }
   };
@@ -86,6 +100,18 @@ const Marketplace: React.FC = () => {
         {/* Main Content */}
         <div className="p-4">
           <h1 className="text-2xl font-bold mb-4">Marketplace</h1>
+
+          {/* Display Affiliate Link */}
+          {affiliateLink && (
+            <div className="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded">
+              <p>
+                Your affiliate link:{" "}
+                <a href={affiliateLink} className="text-blue-500 hover:underline">
+                  {affiliateLink}
+                </a>
+              </p>
+            </div>
+          )}
 
           {/* Search Bar */}
           <div className="mb-6">

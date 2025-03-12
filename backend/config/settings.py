@@ -180,6 +180,9 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
 
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",  # Replace with your frontend URL
+]
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_METHODS = ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"]
 CORS_ALLOW_HEADERS = ["accept", "accept-language", "content-type", "authorization", "origin", "x-requested-with"]

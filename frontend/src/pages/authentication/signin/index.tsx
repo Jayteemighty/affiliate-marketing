@@ -16,27 +16,30 @@ const LoginPage: React.FC = () => {
 
   const handleLogin = async (event: React.FormEvent) => {
     event.preventDefault();
-
+  
     if (!email || !password) {
       toast.error("Please fill in both email and password.");
       return;
     }
-
+  
     setIsLoading(true);
-
+  
     try {
       const response = await axios.post(`${BASE_URL2}/api/user/account/login/`, {
         email,
         password,
       });
-
+  
       if (response.status === 200) {
         toast.success(response.data.message || "User signed in successfully!");
-
+  
         // Save token and user data to local storage
         localStorage.setItem("token", response.data.token);
         localStorage.setItem("user", JSON.stringify(response.data.user));
-
+  
+        // Log the token to verify it is stored correctly
+        console.log("Token stored:", response.data.token);
+  
         // Redirect to dashboard after 2 seconds
         setTimeout(() => {
           navigate("/dashboard");
@@ -54,6 +57,7 @@ const LoginPage: React.FC = () => {
       setIsLoading(false);
     }
   };
+  
 
   return (
     <DefaultLayout>
