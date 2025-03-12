@@ -80,37 +80,6 @@ class GenerateAffiliateLinkView(APIView):
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-
-
-# class GenerateAffiliateLinkView(generics.CreateAPIView):
-#     """API to generate a unique affiliate link for a course."""
-#     permission_classes = [IsAuthenticated]
-
-#     def post(self, request, *args, **kwargs):
-#         user = request.user
-#         course_id = request.data.get('course_id')
-
-#         if not course_id:
-#             return Response({'error': 'Course ID is required'}, status=status.HTTP_400_BAD_REQUEST)
-
-#         course = get_object_or_404(Course, id=course_id)
-#         affiliate, _ = Affiliate.objects.get_or_create(user=user)
-
-#         # Generate a unique affiliate link using the unique_token
-#         affiliate_course, created = AffiliateCourse.objects.get_or_create(
-#             affiliate=affiliate,
-#             course=course
-#         )
-
-#         affiliate_link = f"http://127.0.0.1:8000/course/{course_id}/{affiliate_course.unique_token}"
-
-#         # Update the affiliate_link field
-#         affiliate_course.affiliate_link = affiliate_link
-#         affiliate_course.save()
-
-#         return Response({'affiliate_link': affiliate_link}, status=status.HTTP_201_CREATED)
-
-
 class TrackReferralView(APIView):
     """API to track affiliate referrals."""
     permission_classes = []
