@@ -4,14 +4,16 @@ import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Preloader from "../../../components/Preloader"; // Import the Preloader
-import { BASE_URL } from "../../../libs/constants"; // Import the base URL
+import { BASE_URL2 } from "../../../libs/constants"; // Import the base URL
 
 const SignUpPage: React.FC = () => {
   const [formData, setFormData] = useState({
-    name: "",
+    first_name: "",
+    last_name: "",
     email: "",
+    phone_number: "",
     password: "",
-    country: "",
+    password2: "",
   });
   const [termsChecked, setTermsChecked] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false); // Loading state
@@ -43,8 +45,21 @@ const SignUpPage: React.FC = () => {
     }
 
     // Validate form fields
-    if (!formData.name || !formData.email || !formData.password || !formData.country) {
+    if (
+      !formData.first_name ||
+      !formData.last_name ||
+      !formData.email ||
+      !formData.phone_number ||
+      !formData.password ||
+      !formData.password2
+    ) {
       toast.error("All fields must be filled.");
+      return;
+    }
+
+    // Validate password match
+    if (formData.password !== formData.password2) {
+      toast.error("Passwords do not match.");
       return;
     }
 
@@ -52,11 +67,14 @@ const SignUpPage: React.FC = () => {
 
     try {
       // Send POST request to the backend
-      const response = await axios.post(`${BASE_URL}/api/register`, formData);
+      const response = await axios.post(
+        `${BASE_URL2}/api/user/account/registerd/`,
+        formData
+      );
 
       // Handle successful response
-      if (response.status === 200) {
-        toast.success("User signed up successfully!");
+      if (response.status === 201) {
+        toast.success("Account created successfully. Check your email for a welcome message.");
         localStorage.setItem("user", JSON.stringify(response.data));
 
         // Redirect after 3 seconds
@@ -67,7 +85,9 @@ const SignUpPage: React.FC = () => {
     } catch (error) {
       // Handle errors
       if (axios.isAxiosError(error)) {
-        toast.error(error.response?.data.message || "An error occurred during signup.");
+        toast.error(
+          error.response?.data.error || "An error occurred during signup."
+        );
       } else {
         toast.error("An unexpected error occurred.");
       }
@@ -91,21 +111,40 @@ const SignUpPage: React.FC = () => {
           </p>
 
           <form onSubmit={handleSubmit}>
-            {/* Full Name Field */}
+            {/* First Name Field */}
             <div className="mb-4">
               <label
-                htmlFor="name"
+                htmlFor="first_name"
                 className="block text-sm font-medium text-gray-700 mb-1"
               >
-                Full Name
+                First Name
               </label>
               <input
                 type="text"
-                id="name"
-                name="name"
-                placeholder="Enter your full name"
+                id="first_name"
+                name="first_name"
+                placeholder="Enter your first name"
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-200"
-                value={formData.name}
+                value={formData.first_name}
+                onChange={handleChange}
+              />
+            </div>
+
+            {/* Last Name Field */}
+            <div className="mb-4">
+              <label
+                htmlFor="last_name"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Last Name
+              </label>
+              <input
+                type="text"
+                id="last_name"
+                name="last_name"
+                placeholder="Enter your last name"
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-200"
+                value={formData.last_name}
                 onChange={handleChange}
               />
             </div>
@@ -129,31 +168,23 @@ const SignUpPage: React.FC = () => {
               />
             </div>
 
-            {/* Country Dropdown */}
+            {/* Phone Number Field */}
             <div className="mb-4">
               <label
-                htmlFor="country"
+                htmlFor="phone_number"
                 className="block text-sm font-medium text-gray-700 mb-1"
               >
-                Country
+                Phone Number
               </label>
-              <select
-                id="country"
-                name="country"
+              <input
+                type="text"
+                id="phone_number"
+                name="phone_number"
+                placeholder="Enter your phone number"
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-200"
-                value={formData.country}
+                value={formData.phone_number}
                 onChange={handleChange}
-              >
-                <option value="" disabled>
-                  Select Country
-                </option>
-                {/* List of Countries */}
-                <option value="Afghanistan">Nigeria</option>
-                <option value="Albania">Ghana</option>
-                <option value="Algeria">Algeria</option>
-                {/* Add all other countries here... */}
-                <option value="Zimbabwe">Zimbabwe</option>
-              </select>
+              />
             </div>
 
             {/* Password Field */}
@@ -171,6 +202,25 @@ const SignUpPage: React.FC = () => {
                 placeholder="Enter your password"
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-200"
                 value={formData.password}
+                onChange={handleChange}
+              />
+            </div>
+
+            {/* Confirm Password Field */}
+            <div className="mb-4">
+              <label
+                htmlFor="password2"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Confirm Password
+              </label>
+              <input
+                type="password"
+                id="password2"
+                name="password2"
+                placeholder="Confirm your password"
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-200"
+                value={formData.password2}
                 onChange={handleChange}
               />
             </div>

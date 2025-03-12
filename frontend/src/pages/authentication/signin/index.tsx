@@ -5,12 +5,14 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 import Preloader from "../../../components/Preloader";
-import { BASE_URL } from "../../../libs/constants";
+import { BASE_URL2 } from "../../../libs/constants";
+import { useNavigate } from "react-router-dom";
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const navigate = useNavigate();
 
   const handleLogin = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -23,22 +25,28 @@ const LoginPage: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post(`${BASE_URL}/api/user/login`, {
+      const response = await axios.post(`${BASE_URL2}/api/user/account/login/`, {
         email,
         password,
       });
 
       if (response.status === 200) {
-        toast.success("User signed in successfully!");
-        localStorage.setItem("user", JSON.stringify(response.data));
+        toast.success(response.data.message || "User signed in successfully!");
 
+        // Save token and user data to local storage
+        localStorage.setItem("token", response.data.token);
+        localStorage.setItem("user", JSON.stringify(response.data.user));
+
+        // Redirect to dashboard after 2 seconds
         setTimeout(() => {
-          window.location.href = "/dashboard";
+          navigate("/dashboard");
         }, 2000);
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        toast.error(error.response?.data.message || "Login failed. Please try again.");
+        toast.error(
+          error.response?.data.error || "Login failed. Please try again."
+        );
       } else {
         toast.error("An unexpected error occurred. Please try again.");
       }
@@ -54,13 +62,9 @@ const LoginPage: React.FC = () => {
 
       <section className="flex h-screen">
         {/* Left Section */}
-        <div className="hidden lg:block w-1/2 bg-gray-900 text-white flex items-center justify-center">
+        <div className="hidden lg:block w-1/2 bg-gray-900 text-white items-center justify-center">
           <div className="space-y-8">
-            <img
-              src={logo}
-              alt="PromptEarn"
-              className="w-64 mb-8"
-            />
+            <img src={logo} alt="PromptEarn" className="w-64 mb-8" />
             <p className="text-2xl font-bold max-w-md p-8">
               It only takes a few seconds to log into your account.
             </p>

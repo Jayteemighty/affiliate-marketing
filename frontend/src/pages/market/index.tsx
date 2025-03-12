@@ -1,13 +1,77 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import Sidebar from "../../components/Sidebar";
 import Navbar from "../../components/Navbar";
+import { BASE_URL2 } from "../../libs/constants";
+import { useNavigate } from "react-router-dom";
+
+interface Course {
+  id: number;
+  title: string;
+  price: number;
+  commission: number;
+  instructor: string;
+}
 
 const Marketplace: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
+
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        const response = await axios.get(`${BASE_URL2}/api/course/courses/`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+        setCourses(response.data);
+      } catch (error) {
+        toast.error("Failed to fetch courses. Please try again later.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchCourses();
+  }, []);
+
+  const handlePromote = async (courseId: number) => {
+    try {
+      const response = await axios.post(
+        `${BASE_URL2}/api/affiliate/generate-link/`,
+        { course_id: courseId },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+
+      const affiliateLink = response.data.affiliate_link;
+      toast.success("Affiliate link generated successfully!");
+      navigator.clipboard.writeText(affiliateLink);
+      toast.info("Affiliate link copied to clipboard!");
+    } catch (error) {
+      toast.error("Failed to generate affiliate link. Please try again.");
+    }
+  };
+
+  // Redirect to login if user is not authenticated
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/login");
+    }
+  }, [navigate]);
 
   return (
     <div className="flex h-screen bg-gray-100">
@@ -41,7 +105,7 @@ const Marketplace: React.FC = () => {
           </div>
 
           {/* Product Table */}
-          <div className="bg-white shadow-md rounded-lg overflow-hidden">
+          <div className="bg-white shadow-md rounded-lg overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="bg-gray-100">
@@ -53,27 +117,43 @@ const Marketplace: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                <tr className="border-b">
-                  <td className="p-3">
-                    <a href="/details-1" className="text-blue-500">
-                      Automated Blueprint Income Course (ABIC)
-                    </a>
-                  </td>
-                  <td className="p-3">OYEBAMIJI FATHIA KANYINSOLA</td>
-                  <td className="p-3">$15</td>
-                  <td className="p-3">50%</td>
-                  <td className="p-3">
-                    <button className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600">
-                      Promote
-                    </button>
-                  </td>
-                </tr>
-                {/* Add more rows here */}
+                {isLoading ? (
+                  <tr>
+                    <td colSpan={5} className="p-3 text-center">
+                      Loading...
+                    </td>
+                  </tr>
+                ) : (
+                  courses.map((course) => (
+                    <tr key={course.id} className="border-b">
+                      <td className="p-3">
+                        <a
+                          href={`/course/${course.id}`}
+                          className="text-blue-500 hover:underline"
+                        >
+                          {course.title}
+                        </a>
+                      </td>
+                      <td className="p-3">{course.instructor}</td>
+                      <td className="p-3">NGN{course.price}</td>
+                      <td className="p-3">{course.commission}%</td>
+                      <td className="p-3">
+                        <button
+                          onClick={() => handlePromote(course.id)}
+                          className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600"
+                        >
+                          Promote
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
         </div>
       </div>
+      <ToastContainer />
     </div>
   );
 };
