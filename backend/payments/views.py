@@ -41,7 +41,7 @@ class InitiatePaymentView(APIView):
         callback_url = f"{settings.BACKEND_URL}/api/payment/callback/"
 
         # Define the redirect URL (frontend generic "payment completed" page)
-        redirect_url = f"{settings.FRONTEND_URL}/payment-completed/"  # Frontend page to handle payment status
+        # redirect_url = f"{settings.FRONTEND_URL}/payment-completed/"  # Frontend page to handle payment status
 
         # Prepare metadata for affiliate tracking
         metadata = {
@@ -54,7 +54,7 @@ class InitiatePaymentView(APIView):
             "email": user.email,
             "amount": int(amount * 100),  # Convert to kobo
             "callback_url": callback_url,  # Backend callback URL
-            "redirect_url": redirect_url,  # Frontend redirect URL
+            # "redirect_url": redirect_url,  # Frontend redirect URL
             "metadata": metadata  # Include metadata for affiliate tracking
         }
 
