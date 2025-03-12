@@ -15,6 +15,7 @@ from .models import Payment, WithdrawalRequest, CustomerAccount, Transaction
 from .serializers import PaymentSerializer, WithdrawalRequestSerializer, CustomerAccountSerializer
 from affiliates.models import Referral, Sale, Commission
 from courses.models import Course
+from affiliates.models import AffiliateCourse
 
 
 class InitiatePaymentView(APIView):
@@ -114,9 +115,9 @@ class PaymentCallbackView(APIView):
                 payment.save()
 
                 # Update user account balance
-                account, _ = CustomerAccount.objects.get_or_create(user=payment.user)
-                account.balance += Decimal(str(payment.amount))
-                account.save()
+                # account, _ = CustomerAccount.objects.get_or_create(user=payment.user)
+                # account.balance += Decimal(str(payment.amount))  # Ensure Decimal
+                # account.save()
 
                 # Handle affiliate commission (if applicable)
                 metadata = response_data['data']['metadata']
@@ -131,10 +132,10 @@ class PaymentCallbackView(APIView):
                     course = affiliate_course.course
 
                     # Get the commission rate for the course
-                    commission_rate = Commission.objects.get(course=course).rate
+                    commission_rate = Decimal(str(Commission.objects.get(course=course).rate))  # Ensure Decimal
 
                     # Calculate the commission amount
-                    commission_amount = Decimal(str(payment.amount)) * commission_rate
+                    commission_amount = Decimal(str(payment.amount)) * commission_rate  # Ensure Decimal
 
                     # Create a referral record and mark it as completed
                     referral = Referral.objects.create(
@@ -147,31 +148,32 @@ class PaymentCallbackView(APIView):
                     # Update affiliate earnings and sales
                     affiliate.overall_sales += 1
                     affiliate.today_sales += 1
-                    affiliate.overall_affiliate_earnings += commission_amount
-                    affiliate.today_affiliate_earnings += commission_amount
-                    affiliate.available_affiliate_earnings += commission_amount
+                    affiliate.overall_affiliate_earnings += Decimal(str(commission_amount))  # Ensure Decimal
+                    affiliate.today_affiliate_earnings += Decimal(str(commission_amount))  # Ensure Decimal
+                    affiliate.available_affiliate_earnings += Decimal(str(commission_amount))  # Ensure Decimal
                     affiliate.save()
 
                     # Record the sale
                     Sale.objects.create(
                         vendor=affiliate.user,
-                        amount=payment.amount,
-                        commission=commission_amount,
+                        amount=Decimal(str(payment.amount)),  # Ensure Decimal
+                        commission=Decimal(str(commission_amount)),  # Ensure Decimal
                         referral=referral  # Link to the referral
                     )
 
                 # Redirect to frontend success page
-                return HttpResponseRedirect("http://127.0.0.1:8000/api/v1/payment/success-dummy")
+                return HttpResponseRedirect("https://profits-plus-tau.vercel.app/payment/success")
             else:
                 payment = Payment.objects.get(reference=reference)
                 payment.status = 'failed'
                 payment.save()
 
                 # Redirect to frontend failure page
-                return HttpResponseRedirect("http://127.0.0.1:8000/api/v1/payment/failure-dummy")
+                return HttpResponseRedirect("https://profits-plus-tau.vercel.app/payment/failure")
 
         except requests.exceptions.RequestException:
             return Response({'error': 'Failed to verify payment'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
 
 
 class WithdrawalRequestView(generics.CreateAPIView):

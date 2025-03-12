@@ -20,6 +20,8 @@ import ProfilePage from "./pages/profile/index";
 import UploadCoursePage from "./pages/courses/uploadcourses";
 import CourseDetails from "./pages/market/[id]";
 import CourseAffiliatePage from "./pages/market/affiliate/[courseId]/[uniqueToken]";
+import PaymentSuccessPage from "./pages/payment/success";
+import PaymentFailurePage from "./pages/payment/failure";
 
 import "./index.css";
 
@@ -47,6 +49,8 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         <Route path="/upload-course" element={<UploadCoursePage />} />
         <Route path="/course/:id" element={<CourseDetails />} />
         <Route path="/course/:courseId/:uniqueToken" element={<CourseAffiliatePage />} />
+        <Route path="/payment/success" element={<PaymentSuccessPage />} />
+        <Route path="/payment/failure" element={<PaymentFailurePage />} />
         {/* Add more routes here */}
       </Routes>
     </BrowserRouter>
