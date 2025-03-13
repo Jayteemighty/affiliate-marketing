@@ -28,6 +28,7 @@ class AffiliateCourse(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="affiliate_courses")
     affiliate_link = models.URLField(unique=True)  # Unique link for tracking
     unique_token = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)  # Unique token for the link
+    referral_count = models.PositiveIntegerField(default=0)
 
     def __str__(self):
         return f"{self.affiliate.user.email} - {self.course.title}"
@@ -48,8 +49,8 @@ class Referral(models.Model):
 
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="referrals")
     affiliate = models.ForeignKey(Affiliate, on_delete=models.CASCADE, related_name="referrals")
-    referred_user_email = models.EmailField()
-    is_completed = models.BooleanField(default=False)  # Track if the referral resulted in a sale
+    referred_user_email = models.EmailField(null=False, blank=False)
+    is_completed = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.affiliate.user.email} referred {self.referred_user_email} for {self.course.title}"

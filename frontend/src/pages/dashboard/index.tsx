@@ -1,25 +1,81 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Sidebar from "../../components/Sidebar";
+import axios from "axios";
+import { BASE_URL2 } from "../../libs/constants";
+import Preloader from "../../components/Preloader";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
+interface AffiliateData {
+  today_sales: number;
+  overall_sales: number;
+  today_affiliate_earnings: number;
+  overall_affiliate_earnings: number;
+  available_affiliate_earnings: number;
+  withdrawal_fee: number;
+}
 
 const DashboardPage: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [currency, setCurrency] = useState("1"); // Default currency value
+  const [affiliateData, setAffiliateData] = useState<AffiliateData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
-  const [currency, setCurrency] = useState("1"); // Default currency value
-  // const [isDateFilterVisible, setIsDateFilterVisible] = useState(false); // Toggle date filter visibility
-
-  // Function to handle currency change
   const handleCurrencyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setCurrency(e.target.value);
   };
 
-  // Function to toggle date filter dropdown
-  // const toggleDateFilter = () => {
-  //   setIsDateFilterVisible((prev) => !prev);
-  // };
+  // Fetch affiliate data from the backend
+  useEffect(() => {
+    const fetchAffiliateData = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        toast.error("Please log in to view your dashboard.");
+        return;
+      }
+
+      try {
+        const response = await axios.get(`${BASE_URL2}/api/affiliate/dashboard/`, {
+          headers: {
+            Authorization: `Token ${token}`,
+          },
+        });
+
+        setAffiliateData(response.data);
+      } catch (error) {
+        toast.error("Failed to fetch affiliate data. Please try again.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchAffiliateData();
+  }, []);
+
+  if (isLoading && <Preloader />) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="text-center">
+          <div className="spinner-border animate-spin inline-block w-8 h-8 border-4 rounded-full" role="status">
+            <span className="visually-hidden"></span>
+          </div>
+          <p className="mt-2">Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!affiliateData) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <p className="text-red-500">Failed to load affiliate data.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-screen bg-gray-100">
@@ -62,7 +118,6 @@ const DashboardPage: React.FC = () => {
             <div className="relative inline-block text-left">
               <i
                 className="fa fa-caret-down absolute right-4 top-2 cursor-pointer text-green-500"
-                // onClick={toggleDateFilter} // Reuse the same icon for dropdown toggle
               ></i>
               <select
                 id="currency"
@@ -77,26 +132,6 @@ const DashboardPage: React.FC = () => {
                 <option value="4">Currency: CFA</option>
               </select>
             </div>
-
-            {/* Filter by Date Buttons */}
-            {/* <div className="flex items-center space-x-4">
-              <button
-                onClick={toggleDateFilter}
-                id="show1"
-                className="w-[150px] border-none cursor-pointer bg-white text-gray-500 px-2 py-1 rounded-md hover:text-black transition-colors"
-              >
-                Filter by date
-              </button>
-              {isDateFilterVisible && (
-                <button
-                  onClick={toggleDateFilter}
-                  id="show2"
-                  className="w-[150px] border-none cursor-pointer bg-white text-gray-500 px-2 py-1 rounded-md hover:text-black transition-colors"
-                >
-                  Filter by date
-                </button>
-              )}
-            </div> */}
           </div>
         </div>
 
@@ -111,7 +146,7 @@ const DashboardPage: React.FC = () => {
               <div className="ml-2">
                 <h2 className="text-lg md:text-xl font-semibold">Overall Affiliate Earnings</h2>
                 <p className="text-2xl md:text-3xl font-bold">
-                  <span>$</span><span>0</span>
+                  <span>₦</span><span>{affiliateData.overall_affiliate_earnings}</span>
                 </p>
               </div>
             </div>
@@ -127,7 +162,7 @@ const DashboardPage: React.FC = () => {
               <div className="ml-2">
                 <h2 className="text-lg md:text-xl font-semibold">Overall Vendor Earnings</h2>
                 <p className="text-2xl md:text-3xl font-bold">
-                  <span>$</span><span>0</span>
+                  <span>₦</span><span>0</span>
                 </p>
               </div>
             </div>
@@ -142,7 +177,7 @@ const DashboardPage: React.FC = () => {
               </div>
               <div className="ml-2">
                 <h2 className="text-lg md:text-xl font-semibold">Overall Sales</h2>
-                <p className="text-2xl md:text-3xl font-bold">0</p>
+                <p className="text-2xl md:text-3xl font-bold">{affiliateData.overall_sales}</p>
               </div>
             </div>
             <div className="text-gray-600">Total</div>
@@ -157,7 +192,7 @@ const DashboardPage: React.FC = () => {
               <div className="ml-2">
                 <h2 className="text-lg md:text-xl font-semibold">Available Affiliate Earnings</h2>
                 <p className="text-2xl md:text-3xl font-bold">
-                  <span>$</span><span>0</span>
+                  <span>₦</span><span>{affiliateData.available_affiliate_earnings}</span>
                 </p>
               </div>
             </div>
@@ -172,7 +207,7 @@ const DashboardPage: React.FC = () => {
                 placeholder="Type Amount Here"
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-200"
               />
-              <p className="text-red-500 text-sm">Please ensure you type the amount you want to withdraw in <b>dollar</b></p>
+              <p className="text-red-500 text-sm">Please ensure you type the amount you want to withdraw in <b>Naira</b></p>
               <button type="submit" className="mt-2 bg-purple-800 text-white px-4 py-2 rounded-md hover:bg-red-600 transition duration-300">
                 Withdraw
               </button>
@@ -188,7 +223,7 @@ const DashboardPage: React.FC = () => {
               <div className="ml-2">
                 <h2 className="text-lg md:text-xl font-semibold">Available Vendor Earnings</h2>
                 <p className="text-2xl md:text-3xl font-bold">
-                  <span>$</span><span>0</span>
+                  <span>₦</span><span>0</span>
                 </p>
               </div>
             </div>
@@ -203,7 +238,7 @@ const DashboardPage: React.FC = () => {
                 placeholder="Type Amount Here"
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-200"
               />
-              <p className="text-red-500 text-sm">Please ensure you type the amount you want to withdraw in <b>dollar</b></p>
+              <p className="text-red-500 text-sm">Please ensure you type the amount you want to withdraw in <b>Naira</b></p>
               <button type="submit" className="mt-2 bg-purple-800 text-white px-4 py-2 rounded-md hover:bg-red-600 transition duration-300">
                 Withdraw
               </button>
@@ -232,13 +267,14 @@ const DashboardPage: React.FC = () => {
               <div className="ml-2">
                 <h2 className="text-lg md:text-xl font-semibold">Total Withdrawals</h2>
                 <p className="text-2xl md:text-3xl font-bold">
-                  <span>$</span><span>0</span>
+                  <span>₦</span><span>0</span>
                 </p>
               </div>
             </div>
           </div>
         </div>
       </div>
+      <ToastContainer />
     </div>
   );
 };

@@ -189,6 +189,6 @@ CORS_ALLOW_HEADERS = ["accept", "accept-language", "content-type", "authorizatio
 
 # Payment Env
 BACKEND_URL = os.getenv('BACKEND_URL', default='http://localhost:8000')
-FRONTEND_URL = os.getenv('FRONTEND_URL', default='http://localhost:3000')
+FRONTEND_URL = os.getenv('FRONTEND_URL', default='http://localhost:5173')
 PAYSTACK_SECRET_KEY = os.getenv('paystack-secret-key')
 # PAYSTACK_PUBLIC_KEY = os.getenv('paystack-public-key')

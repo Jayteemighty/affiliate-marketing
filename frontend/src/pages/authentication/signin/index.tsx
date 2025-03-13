@@ -33,12 +33,14 @@ const LoginPage: React.FC = () => {
       if (response.status === 200) {
         toast.success(response.data.message || "User signed in successfully!");
   
-        // Save token and user data to local storage
+        // Save token, user data, and email to local storage
         localStorage.setItem("token", response.data.token);
         localStorage.setItem("user", JSON.stringify(response.data.user));
+        localStorage.setItem("userEmail", email); // Store the user's email
   
-        // Log the token to verify it is stored correctly
+        // Log the token and email to verify they are stored correctly
         console.log("Token stored:", response.data.token);
+        console.log("Email stored:", email);
   
         // Redirect to dashboard after 2 seconds
         setTimeout(() => {

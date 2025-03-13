@@ -5,20 +5,22 @@ from .models import Course
 from affiliates.models import Commission
 
 class CourseSerializer(serializers.ModelSerializer):
+    instructor_name = serializers.SerializerMethodField()
     commission_rate = serializers.SerializerMethodField()
 
     class Meta:
         model = Course
-        fields = [
-            "id", "title", "description", "price", "instructor", "created_at", 
-            "video_url", "seller_name", "is_approved", "commission_rate"
-        ]
+        fields = ['id', 'title', 'price', 'instructor_name', 'description', 'commission_rate', 'video_url', "created_at", 'seller_name', 'is_approved']
+
+    def get_instructor_name(self, obj):
+        return f"{obj.instructor.first_name} {obj.instructor.last_name}"
 
     def get_commission_rate(self, obj):
-        """Retrieve commission rate for the course, default to None if not set."""
-        commission = getattr(obj, "commission", None)
-        return commission.rate if commission else None
-
+        try:
+            commission = Commission.objects.get(course=obj)
+            return commission.rate * 100
+        except Commission.DoesNotExist:
+            return 0
 
 class LessonSerializer(serializers.ModelSerializer):
     class Meta:

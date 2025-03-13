@@ -11,7 +11,7 @@ interface Course {
   title: string;
   description: string;
   price: number;
-  instructor: string;
+  instructor_name: string;
   video_url: string;
   seller_name: string;
   is_approved: boolean;
@@ -129,7 +129,7 @@ const CourseDetails: React.FC = () => {
                 </div>
                 <div>
                   <span className="font-bold text-gray-600">Instructor:</span>{" "}
-                  <span className="text-blue-500">{course.instructor}</span>
+                  <span className="text-blue-500">{course.instructor_name}</span>
                 </div>
                 <div>
                   <span className="font-bold text-gray-600">Seller:</span>{" "}

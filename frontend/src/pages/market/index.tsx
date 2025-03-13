@@ -11,8 +11,8 @@ interface Course {
   id: number;
   title: string;
   price: number;
-  commission: number;
-  instructor: string;
+  instructor_name: string;
+  commission_rate: number;
 }
 
 const Marketplace: React.FC = () => {
@@ -160,9 +160,9 @@ const Marketplace: React.FC = () => {
                           {course.title}
                         </a>
                       </td>
-                      <td className="p-3">{course.instructor}</td>
+                      <td className="p-3">{course.instructor_name}</td> {/* Display instructor's full name */}
                       <td className="p-3">NGN{course.price}</td>
-                      <td className="p-3">{course.commission}%</td>
+                      <td className="p-3">{course.commission_rate}%</td> {/* Display commission rate */}
                       <td className="p-3">
                         <button
                           onClick={() => handlePromote(course.id)}

@@ -11,7 +11,7 @@ interface Course {
   title: string;
   description: string;
   price: number;
-  instructor: string;
+  instructor_name: string;
   video_url: string;
   seller_name: string;
   is_approved: boolean;
@@ -55,10 +55,26 @@ const CourseAffiliatePage: React.FC = () => {
 
     const trackAffiliateReferral = async () => {
       try {
-        await axios.post(`${BASE_URL2}/api/affiliate/track-referral/`, {
-          unique_token: uniqueToken,
-        });
-        console.log("Affiliate referral tracked successfully.");
+        const userEmail = localStorage.getItem("userEmail"); // Retrieve the user's email
+        if (!userEmail) {
+          console.error("User email not found in localStorage.");
+          return;
+        }
+    
+        const response = await axios.post(
+          `${BASE_URL2}/api/affiliate/track-referral/`,
+          {
+            unique_token: uniqueToken,
+            referred_user_email: userEmail, // Pass the referred user's email
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+    
+        console.log("Affiliate referral tracked successfully:", response.data);
       } catch (error) {
         console.error("Failed to track affiliate referral:", error);
       }
@@ -70,25 +86,25 @@ const CourseAffiliatePage: React.FC = () => {
 
   const handlePayment = async () => {
     const token = localStorage.getItem("token");
-
+  
     // Redirect to login if token is missing
     if (!token) {
       toast.error("Your session has expired. Please log in again.");
       navigate("/login");
       return;
     }
-
+  
     try {
       const response = await axios.post(
         `${BASE_URL2}/api/payment/initiate/`,
-        { course_id: courseId },
+        { course_id: courseId, unique_token: uniqueToken }, // Include unique_token
         {
           headers: {
             Authorization: `Token ${token}`,
           },
         }
       );
-
+  
       if (response.data.authorization_url) {
         window.location.href = response.data.authorization_url; // Redirect to Paystack payment page
       }
@@ -141,7 +157,7 @@ const CourseAffiliatePage: React.FC = () => {
                 </div>
                 <div>
                   <span className="font-bold text-gray-600">Instructor:</span>{" "}
-                  <span className="text-blue-500">{course.instructor}</span>
+                  <span className="text-blue-500">{course.instructor_name}</span>
                 </div>
                 <div>
                   <span className="font-bold text-gray-600">Seller:</span>{" "}
