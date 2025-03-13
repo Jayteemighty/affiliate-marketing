@@ -11,6 +11,9 @@ User = get_user_model()
 from django.core.mail import send_mail
 from django.conf import settings
 
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError as DjangoValidationError
+
 class CreatedAccountSerializer(serializers.ModelSerializer):
     ''' Serializer to create new user '''
 
@@ -27,16 +30,32 @@ class CreatedAccountSerializer(serializers.ModelSerializer):
     def validate(self, data):
         '''Account creation validation function'''
 
+        # Validate email format
+        try:
+            validate_email(data['email'])
+        except DjangoValidationError:
+            raise serializers.ValidationError({'error': 'Please enter a valid email address.'}, code=status.HTTP_400_BAD_REQUEST)
+
+        # Validate password match
         if data['password'] != data['password2']:
-            raise serializers.ValidationError({'error': 'Your passwords do not match'}, code=status.HTTP_400_BAD_REQUEST)
-        
+            raise serializers.ValidationError({'error': 'Your passwords do not match.'}, code=status.HTTP_400_BAD_REQUEST)
+
+        # Check if email already exists
         if User.objects.filter(email=data['email']).exists():
-            raise serializers.ValidationError({'error': 'Email already exists'}, code=status.HTTP_400_BAD_REQUEST)
-        
-        validate_password(data['password'])
-        
+            raise serializers.ValidationError({'error': 'Email already exists.'}, code=status.HTTP_400_BAD_REQUEST)
+
+        # Validate password strength
+        try:
+            validate_password(data['password'])
+        except DjangoValidationError as e:
+            raise serializers.ValidationError({'error': e.messages[0]}, code=status.HTTP_400_BAD_REQUEST)
+
+        # Validate phone number (basic validation)
+        if not data['phone_number'].isdigit() or len(data['phone_number']) < 10 or len(data['phone_number']) > 15:
+            raise serializers.ValidationError({'error': 'Please enter a valid phone number.'}, code=status.HTTP_400_BAD_REQUEST)
+
         return data
-    
+
     def create(self, validated_data):
         '''Account creation function'''
         

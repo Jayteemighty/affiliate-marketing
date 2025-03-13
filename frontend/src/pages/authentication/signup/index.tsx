@@ -37,46 +37,73 @@ const SignUpPage: React.FC = () => {
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+  
     // Validate terms and conditions
     if (!termsChecked) {
       toast.error("You must agree to the terms and conditions.");
       return;
     }
-
+  
     // Validate form fields
-    if (
-      !formData.first_name ||
-      !formData.last_name ||
-      !formData.email ||
-      !formData.phone_number ||
-      !formData.password ||
-      !formData.password2
-    ) {
-      toast.error("All fields must be filled.");
+    if (!formData.first_name) {
+      toast.error("First name is required.");
       return;
     }
-
+    if (!formData.last_name) {
+      toast.error("Last name is required.");
+      return;
+    }
+    if (!formData.email) {
+      toast.error("Email address is required.");
+      return;
+    }
+    if (!formData.phone_number) {
+      toast.error("Phone number is required.");
+      return;
+    }
+    if (!formData.password) {
+      toast.error("Password is required.");
+      return;
+    }
+    if (!formData.password2) {
+      toast.error("Confirm password is required.");
+      return;
+    }
+  
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      toast.error("Please enter a valid email address.");
+      return;
+    }
+  
+    // Validate phone number format (basic validation)
+    const phoneRegex = /^\d{10,15}$/; // Adjust regex based on your requirements
+    if (!phoneRegex.test(formData.phone_number)) {
+      toast.error("Please enter a valid phone number.");
+      return;
+    }
+  
     // Validate password match
     if (formData.password !== formData.password2) {
       toast.error("Passwords do not match.");
       return;
     }
-
+  
     setIsLoading(true); // Start loading
-
+  
     try {
       // Send POST request to the backend
       const response = await axios.post(
         `${BASE_URL2}/api/user/account/registerd/`,
         formData
       );
-
+  
       // Handle successful response
       if (response.status === 201) {
         toast.success("Account created successfully. Check your email for a welcome message.");
         localStorage.setItem("user", JSON.stringify(response.data));
-
+  
         // Redirect after 3 seconds
         setTimeout(() => {
           window.location.href = "/dashboard"; // Replace with your desired redirect path
@@ -85,9 +112,8 @@ const SignUpPage: React.FC = () => {
     } catch (error) {
       // Handle errors
       if (axios.isAxiosError(error)) {
-        toast.error(
-          error.response?.data.error || "An error occurred during signup."
-        );
+        const errorMessage = error.response?.data.error || "An error occurred during signup.";
+        toast.error(errorMessage);
       } else {
         toast.error("An unexpected error occurred.");
       }
@@ -185,6 +211,10 @@ const SignUpPage: React.FC = () => {
                 value={formData.phone_number}
                 onChange={handleChange}
               />
+              {/* Phone number Hint */}
+              <p className="text-xs text-gray-500 mt-1">
+                Phone number must contain at least 10 digits and not more than 15 digits.
+              </p>
             </div>
 
             {/* Password Field */}
@@ -204,6 +234,10 @@ const SignUpPage: React.FC = () => {
                 value={formData.password}
                 onChange={handleChange}
               />
+              {/* Password Hint */}
+              <p className="text-xs text-gray-500 mt-1">
+                Password must contain at least 8 characters.
+              </p>
             </div>
 
             {/* Confirm Password Field */}
