@@ -50,10 +50,10 @@ const LoginPage: React.FC = () => {
     } catch (error) {
       if (axios.isAxiosError(error)) {
         toast.error(
-          error.response?.data.error || "Login failed. Please try again."
+          error.response?.data.error || "Login failed. Please recheck credentials. "
         );
       } else {
-        toast.error("An unexpected error occurred. Please try again.");
+        toast.error("An unexpected error occurred. Please recheck credentials.");
       }
     } finally {
       setIsLoading(false);
