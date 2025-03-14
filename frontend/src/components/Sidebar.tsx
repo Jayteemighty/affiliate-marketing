@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -7,6 +7,21 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    // Clear authentication state
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    localStorage.removeItem("userEmail");
+
+    // Redirect to home page
+    navigate("/");
+
+    // Close the sidebar (if open)
+    onClose();
+  };
+
   return (
     <>
       {/* Overlay for Mobile (Visible when sidebar is open) */}
@@ -117,13 +132,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           >
             <span className="material-icons mr-2">person</span> Profile
           </Link>
-          <Link
-            to="/"
-            className="block py-2 px-4 hover:bg-gray-700 rounded-md transition duration-300"
-            onClick={onClose}
+          <button
+            onClick={handleLogout}
+            className="block w-full text-left py-2 px-4 hover:bg-gray-700 rounded-md transition duration-300"
           >
             <span className="material-icons mr-2">logout</span> Logout
-          </Link>
+          </button>
         </nav>
       </aside>
     </>

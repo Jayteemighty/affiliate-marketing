@@ -95,7 +95,7 @@ const Marketplace: React.FC = () => {
                   <th className="p-3 text-left">Products</th>
                   <th className="p-3 text-left">Seller</th>
                   <th className="p-3 text-left">Amount</th>
-                  <th className="p-3 text-left">Comm (%)</th>
+                  {/* <th className="p-3 text-left">Comm (%)</th> */}
                   <th className="p-3 text-left">.</th>
                 </tr>
               </thead>
@@ -119,7 +119,7 @@ const Marketplace: React.FC = () => {
                       </td>
                       <td className="p-3">{course.instructor_name}</td>
                       <td className="p-3">NGN{course.price}</td>
-                      <td className="p-3">{course.commission_rate}%</td>
+                      {/* <td className="p-3">{course.commission_rate}%</td> */}
                       <td className="p-3">
                         <button
                           onClick={() => handlePromote(course.id)}
