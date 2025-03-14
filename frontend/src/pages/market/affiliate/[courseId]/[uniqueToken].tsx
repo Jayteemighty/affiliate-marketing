@@ -30,13 +30,18 @@ const CourseAffiliatePage: React.FC = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-
+  
     // Redirect to login if token is missing
     if (!token) {
-      toast.error("Your session has expired. Please log in again.");
-      navigate("/login");
+      toast.error("You must be logged in to access this page.");
+      navigate("/login", { state: { from: `/course/${courseId}/${uniqueToken}` }});
       return;
     }
+  
+    // Fetch course and track referral logic
+  //   fetchCourse();
+  //   trackAffiliateReferral();
+  // }, [courseId, uniqueToken, navigate]);
 
     const fetchCourse = async () => {
       try {
@@ -118,7 +123,7 @@ const CourseAffiliatePage: React.FC = () => {
       <div className="flex justify-center items-center h-screen">
         <div className="text-center">
           <div className="spinner-border animate-spin inline-block w-8 h-8 border-4 rounded-full" role="status">
-            <span className="visually-hidden">Loading...</span>
+            <span className="visually-hidden"></span>
           </div>
           <p className="mt-2">Loading course details...</p>
         </div>

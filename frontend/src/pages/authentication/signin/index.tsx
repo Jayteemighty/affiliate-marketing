@@ -6,51 +6,51 @@ import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 import Preloader from "../../../components/Preloader";
 import { BASE_URL2 } from "../../../libs/constants";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const location = useLocation();
   const navigate = useNavigate();
 
   const handleLogin = async (event: React.FormEvent) => {
     event.preventDefault();
-  
+
     if (!email || !password) {
       toast.error("Please fill in both email and password.");
       return;
     }
-  
+
     setIsLoading(true);
-  
+
     try {
       const response = await axios.post(`${BASE_URL2}/api/user/account/login/`, {
         email,
         password,
       });
-  
+
       if (response.status === 200) {
         toast.success(response.data.message || "User signed in successfully!");
-  
+
         // Save token, user data, and email to local storage
         localStorage.setItem("token", response.data.token);
         localStorage.setItem("user", JSON.stringify(response.data.user));
         localStorage.setItem("userEmail", email); // Store the user's email
-  
+
         // Log the token and email to verify they are stored correctly
         console.log("Token stored:", response.data.token);
         console.log("Email stored:", email);
-  
-        // Redirect to dashboard after 2 seconds
-        setTimeout(() => {
-          navigate("/dashboard");
-        }, 2000);
+
+        // Redirect to the referral link URL or dashboard
+        const from = location.state?.from || "/dashboard";
+        navigate(from); // Redirect to the stored URL or dashboard
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
         toast.error(
-          error.response?.data.error || "Login failed. Please recheck credentials. "
+          error.response?.data.error || "Login failed. Please recheck credentials."
         );
       } else {
         toast.error("An unexpected error occurred. Please recheck credentials.");
@@ -59,7 +59,6 @@ const LoginPage: React.FC = () => {
       setIsLoading(false);
     }
   };
-  
 
   return (
     <DefaultLayout>
