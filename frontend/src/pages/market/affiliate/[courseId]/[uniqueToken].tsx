@@ -34,7 +34,7 @@ const CourseAffiliatePage: React.FC = () => {
     // Redirect to login if token is missing
     if (!token) {
       toast.error("You must be logged in to access this page.");
-      navigate("/login", { state: { from: `/course/${courseId}/${uniqueToken}` }});
+      navigate("/register", { state: { from: `/course/${courseId}/${uniqueToken}` }});
       return;
     }
   
