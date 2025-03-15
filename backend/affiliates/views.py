@@ -8,6 +8,12 @@ from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
 from django.conf import settings
 from decimal import Decimal
+from django.db.models import Sum
+from courses.models import Course
+from payments.models import Withdrawal
+
+import logging
+logger = logging.getLogger(__name__)
 
 
 class AffiliateDashboardView(generics.RetrieveAPIView):
@@ -24,11 +30,47 @@ class AffiliateDashboardView(generics.RetrieveAPIView):
         try:
             # Retrieve the affiliate object
             affiliate = self.get_object()
+
+            # Calculate vendor earnings
+            vendor_earnings = Sale.objects.filter(vendor=self.request.user).aggregate(
+                total_earnings=Sum('amount', default=Decimal('0.00')) - Sum('commission', default=Decimal('0.00'))
+            )
+            overall_vendor_earnings = vendor_earnings.get('total_earnings', Decimal('0.00'))
+
+            # Calculate available vendor earnings (excluding withdrawn amounts)
+            total_withdrawals = Withdrawal.objects.filter(user=self.request.user, status='Approved').aggregate(
+                total_withdrawn=Sum('amount', default=Decimal('0.00'))
+            ).get('total_withdrawn', Decimal('0.00'))
+
+            available_vendor_earnings = overall_vendor_earnings - total_withdrawals
+
+            # Count the number of courses owned by the user
+            my_products = Course.objects.filter(instructor=self.request.user).count()
+
+            # Get affiliate sales data
+            affiliate_sales = Sale.objects.filter(affiliate_seller=self.request.user).aggregate(
+                total_sales=Sum('amount', default=Decimal('0.00')),
+                total_commission=Sum('commission', default=Decimal('0.00'))
+            )
+
             # Serialize the data
             serializer = self.get_serializer(affiliate)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            data = serializer.data
+            data.update({
+                'overall_vendor_earnings': overall_vendor_earnings,
+                'available_vendor_earnings': available_vendor_earnings,
+                'total_withdrawals': total_withdrawals,
+                'my_products': my_products,
+                'affiliate_sales': affiliate_sales.get('total_sales', Decimal('0.00')),
+                'affiliate_commission': affiliate_sales.get('total_commission', Decimal('0.00')),
+                'first_name': request.user.first_name,  # Add first name
+                'email': request.user.email,  # Add email
+            })
+            return Response(data, status=status.HTTP_200_OK)
+
         except Exception as e:
-            # Handle any unexpected errors
+            # Log the error for debugging
+            logger.error(f"Error in AffiliateDashboardView: {str(e)}", exc_info=True)
             return Response(
                 {"error": "An error occurred while fetching the dashboard data.", "details": str(e)},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,

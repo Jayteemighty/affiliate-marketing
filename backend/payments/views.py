@@ -86,7 +86,8 @@ class InitiatePaymentView(APIView):
 
         except requests.exceptions.RequestException:
             return Response({'error': 'Payment initiation failed'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
+
+
 class PaymentCallbackView(APIView):
     """API to handle Paystack payment callback."""
     def get(self, request):
@@ -151,9 +152,10 @@ class PaymentCallbackView(APIView):
                         affiliate.available_affiliate_earnings += commission_amount
                         affiliate.save()
 
-                        # Record the sale
+                        # Record the sale (vendor is the course owner, affiliate_seller is the affiliate)
                         sale = Sale.objects.create(
-                            vendor=affiliate.user,
+                            vendor=course.instructor,  # Set vendor to the course owner (instructor)
+                            affiliate_seller=affiliate.user,  # Set affiliate_seller to the affiliate
                             amount=Decimal(str(payment.amount)),
                             commission=commission_amount,
                             referral=referral

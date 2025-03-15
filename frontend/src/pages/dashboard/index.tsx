@@ -13,6 +13,14 @@ interface AffiliateData {
   overall_affiliate_earnings: number;
   available_affiliate_earnings: number;
   withdrawal_fee: number;
+  overall_vendor_earnings: number;
+  available_vendor_earnings: number;
+  total_withdrawals: number;
+  my_products: number;
+  affiliate_sales: number;
+  affiliate_commission: number;
+  first_name: string;
+  email: string;
 }
 
 const DashboardPage: React.FC = () => {
@@ -105,7 +113,10 @@ const DashboardPage: React.FC = () => {
           </svg>
         </button>
 
-        <h1 className="text-2xl md:text-3xl font-bold mb-4">Hello</h1>
+        {/* Display User's First Name and Email */}
+        <h1 className="text-2xl md:text-3xl font-bold mb-4">
+          Hello, {affiliateData.first_name} {affiliateData.email}
+        </h1>
 
         <h1 className="text-2xl md:text-3xl font-bold mb-4">Welcome to Your Dashboard</h1>
         <p className="text-base md:text-lg text-gray-600 mb-8">
@@ -162,11 +173,11 @@ const DashboardPage: React.FC = () => {
               <div className="ml-2">
                 <h2 className="text-lg md:text-xl font-semibold">Overall Vendor Earnings</h2>
                 <p className="text-2xl md:text-3xl font-bold">
-                  <span>₦</span><span>0</span>
+                  <span>₦</span><span>{affiliateData.overall_vendor_earnings}</span>
                 </p>
               </div>
             </div>
-            <div className="text-gray-600">Current Earnings</div>
+            <div className="text-gray-600">Total Earnings from Sales</div>
           </div>
 
           {/* Overall Sales Card */}
@@ -223,7 +234,7 @@ const DashboardPage: React.FC = () => {
               <div className="ml-2">
                 <h2 className="text-lg md:text-xl font-semibold">Available Vendor Earnings</h2>
                 <p className="text-2xl md:text-3xl font-bold">
-                  <span>₦</span><span>0</span>
+                  <span>₦</span><span>{affiliateData.available_vendor_earnings}</span>
                 </p>
               </div>
             </div>
@@ -253,9 +264,10 @@ const DashboardPage: React.FC = () => {
               </div>
               <div className="ml-2">
                 <h2 className="text-lg md:text-xl font-semibold">My Products</h2>
-                <p className="text-2xl md:text-3xl font-bold">0</p>
+                <p className="text-2xl md:text-3xl font-bold">{affiliateData.my_products}</p>
               </div>
             </div>
+            <div className="text-gray-600">Number of Courses Owned</div>
           </div>
 
           {/* Total Withdrawals Card */}
@@ -267,11 +279,44 @@ const DashboardPage: React.FC = () => {
               <div className="ml-2">
                 <h2 className="text-lg md:text-xl font-semibold">Total Withdrawals</h2>
                 <p className="text-2xl md:text-3xl font-bold">
-                  <span>₦</span><span>0</span>
+                  <span>₦</span><span>{affiliateData.total_withdrawals}</span>
                 </p>
               </div>
             </div>
+            <div className="text-gray-600">Total Successful Withdrawals</div>
           </div>
+
+          {/* Affiliate Sales Card */}
+          {/* <div className="bg-white shadow-md rounded-lg p-4">
+            <div className="flex items-center mb-2">
+              <div className="p-2 bg-purple-200 rounded-full">
+                <i className="material-icons text-purple-800">$</i>
+              </div>
+              <div className="ml-2">
+                <h2 className="text-lg md:text-xl font-semibold">Affiliate Sales</h2>
+                <p className="text-2xl md:text-3xl font-bold">
+                  <span>₦</span><span>{affiliateData.affiliate_sales}</span>
+                </p>
+              </div>
+            </div>
+            <div className="text-gray-600">Total Sales as Affiliate</div>
+          </div> */}
+
+          {/* Affiliate Commission Card */}
+          {/* <div className="bg-white shadow-md rounded-lg p-4">
+            <div className="flex items-center mb-2">
+              <div className="p-2 bg-purple-200 rounded-full">
+                <i className="material-icons text-purple-800">$</i>
+              </div>
+              <div className="ml-2">
+                <h2 className="text-lg md:text-xl font-semibold">Affiliate Commission</h2>
+                <p className="text-2xl md:text-3xl font-bold">
+                  <span>₦</span><span>{affiliateData.affiliate_commission}</span>
+                </p>
+              </div>
+            </div>
+            <div className="text-gray-600">Total Commission Earned</div>
+          </div> */}
         </div>
       </div>
       <ToastContainer />

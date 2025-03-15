@@ -18,7 +18,7 @@ class ReferralAdmin(admin.ModelAdmin):
 
 @admin.register(Sale)
 class SaleAdmin(admin.ModelAdmin):
-    list_display = ('vendor', 'amount', 'commission', 'date')
+    list_display = ('vendor', 'affiliate_seller', 'amount', 'commission', 'date')
     search_fields = ('vendor__email',)
 
 @admin.register(Commission)
