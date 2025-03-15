@@ -11,6 +11,9 @@ urlpatterns = [
 
     # Withdrawal APIs
     path('withdrawal-request/', views.WithdrawalRequestView.as_view(), name='withdrawal-request'),
+    
+    # Transaction APIs
+    path('transaction-status/', views.TransactionStatusView.as_view(), name='transaction-status'),
 
     # Account APIs
     path('account/', views.CustomerAccountView.as_view(), name='customer-account'),

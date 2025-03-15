@@ -1,3 +1,4 @@
+import requests
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
@@ -5,7 +6,6 @@ from rest_framework import status
 from rest_framework import serializers, generics, permissions
 from django.conf import settings
 from django.db.models import Sum
-import requests
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponseRedirect
 from decimal import Decimal
@@ -13,9 +13,11 @@ from rest_framework import generics
 from affiliates.models import Affiliate
 from .models import Payment, WithdrawalRequest, CustomerAccount, Transaction
 from .serializers import PaymentSerializer, WithdrawalRequestSerializer, CustomerAccountSerializer
-from affiliates.models import Referral, Sale, Commission
+from affiliates.models import Referral, Sale, Commission, AffiliateCourse
 from courses.models import Course
-from affiliates.models import AffiliateCourse
+from rest_framework import generics
+from rest_framework.permissions import IsAuthenticated
+from affiliates.serializers import SaleSerializer
 
 
 class InitiatePaymentView(APIView):
@@ -239,3 +241,41 @@ class ListUserPayments(generics.ListAPIView):
     def get_queryset(self):
         user = self.request.user
         return Payment.objects.filter(user=user)
+
+
+class TransactionStatusView(generics.ListAPIView):
+    """API to list all transactions for a user (payments, affiliate sales, and withdrawal requests)."""
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        # Get all payments made by the user
+        user_payments = Payment.objects.filter(user=user)
+        # Get payments for courses owned by the user (if they are an instructor)
+        course_payments = Payment.objects.filter(course__instructor=user)
+        # Get affiliate sales for the user (if they are an affiliate)
+        affiliate_sales = Sale.objects.filter(affiliate_seller=user)
+        # Get withdrawal requests for the user
+        withdrawal_requests = WithdrawalRequest.objects.filter(user=user)
+
+        # Combine all data into a single response
+        return {
+            "user_payments": user_payments,
+            "course_payments": course_payments,
+            "affiliate_sales": affiliate_sales,
+            "withdrawal_requests": withdrawal_requests,
+        }
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        user_payments = PaymentSerializer(queryset["user_payments"], many=True).data
+        course_payments = PaymentSerializer(queryset["course_payments"], many=True).data
+        affiliate_sales = SaleSerializer(queryset["affiliate_sales"], many=True).data
+        withdrawal_requests = WithdrawalRequestSerializer(queryset["withdrawal_requests"], many=True).data
+
+        return Response({
+            "user_payments": user_payments,
+            "course_payments": course_payments,
+            "affiliate_sales": affiliate_sales,
+            "withdrawal_requests": withdrawal_requests,
+        })
