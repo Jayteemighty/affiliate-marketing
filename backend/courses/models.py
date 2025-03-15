@@ -47,8 +47,10 @@ class CourseRequest(models.Model):
     """Model for users to request courses to be uploaded."""
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="course_requests")
+    price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     course_title = models.CharField(max_length=255)
     seller_name = models.CharField(max_length=255)
+    affiliate_commission = models.DecimalField(max_digits=4, decimal_places=2, default=0.40) 
     email = models.EmailField()
     created_at = models.DateTimeField(auto_now_add=True)
     is_fulfilled = models.BooleanField(default=False)  # Admin marks as fulfilled once the course is uploaded
