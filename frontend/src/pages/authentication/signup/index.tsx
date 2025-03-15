@@ -17,11 +17,10 @@ const SignUpPage: React.FC = () => {
     password2: "",
   });
   const [termsChecked, setTermsChecked] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(false); // Loading state
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Handle input changes
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
@@ -32,21 +31,19 @@ const SignUpPage: React.FC = () => {
     });
   };
 
-  // Handle checkbox changes
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTermsChecked(e.target.checked);
   };
 
-  // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-  
+
     // Validate terms and conditions
     if (!termsChecked) {
       toast.error("You must agree to the terms and conditions.");
       return;
     }
-  
+
     // Validate form fields
     if (!formData.first_name) {
       toast.error("First name is required.");
@@ -72,47 +69,44 @@ const SignUpPage: React.FC = () => {
       toast.error("Confirm password is required.");
       return;
     }
-  
+
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
       toast.error("Please enter a valid email address.");
       return;
     }
-  
-    // Validate phone number format (basic validation)
-    const phoneRegex = /^\d{10,15}$/; // Adjust regex based on your requirements
+
+    // Validate phone number format
+    const phoneRegex = /^\d{10,15}$/;
     if (!phoneRegex.test(formData.phone_number)) {
       toast.error("Please enter a valid phone number.");
       return;
     }
-  
+
     // Validate password match
     if (formData.password !== formData.password2) {
       toast.error("Passwords do not match.");
       return;
     }
-  
-    setIsLoading(true); // Start loading
-  
+
+    setIsLoading(true);
+
     try {
-      // Send POST request to the backend
       const response = await axios.post(
         `${BASE_URL2}/api/user/account/registerd/`,
         formData
       );
-  
-      // Handle successful response
+
       if (response.status === 201) {
         toast.success("Account created successfully. Check your email for a welcome message.");
         localStorage.setItem("user", JSON.stringify(response.data));
-  
+
         // Redirect to the referral link URL or dashboard
         const from = location.state?.from || "/dashboard";
-        navigate(from); // Redirect to the stored URL or dashboard
+        navigate(from);
       }
     } catch (error) {
-      // Handle errors
       if (axios.isAxiosError(error)) {
         const errorMessage = error.response?.data.error || "An error occurred during signup.";
         toast.error(errorMessage);
@@ -120,7 +114,7 @@ const SignUpPage: React.FC = () => {
         toast.error("An unexpected error occurred.");
       }
     } finally {
-      setIsLoading(false); // Stop loading
+      setIsLoading(false);
     }
   };
 
@@ -288,6 +282,20 @@ const SignUpPage: React.FC = () => {
             >
               {isLoading ? "Creating Account..." : "Create Account"}
             </button>
+            {/* Login Link */}
+            <p className="text-sm text-gray-600 text-center">
+              Do you have an account?{" "}
+              <a
+                href="/login"
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate("/login", { state: { from: location.state?.from } });
+                }}
+                className="text-blue-600 hover:underline"
+              >
+                Login
+              </a>
+            </p>
           </form>
         </div>
       </div>

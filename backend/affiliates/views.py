@@ -9,13 +9,30 @@ from django.shortcuts import get_object_or_404
 from django.conf import settings
 from decimal import Decimal
 
+
 class AffiliateDashboardView(generics.RetrieveAPIView):
     """API for affiliates to view their dashboard."""
     permission_classes = [IsAuthenticated]
     serializer_class = AffiliateSerializer
 
     def get_object(self):
-        return get_object_or_404(Affiliate, user=self.request.user)
+        # Get or create the Affiliate object for the authenticated user
+        affiliate, created = Affiliate.objects.get_or_create(user=self.request.user)
+        return affiliate
+
+    def retrieve(self, request, *args, **kwargs):
+        try:
+            # Retrieve the affiliate object
+            affiliate = self.get_object()
+            # Serialize the data
+            serializer = self.get_serializer(affiliate)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            # Handle any unexpected errors
+            return Response(
+                {"error": "An error occurred while fetching the dashboard data.", "details": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
 
 
 class GenerateAffiliateLinkView(APIView):

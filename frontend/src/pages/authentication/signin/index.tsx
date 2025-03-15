@@ -130,6 +130,21 @@ const LoginPage: React.FC = () => {
             >
               {isLoading ? "Logging In..." : "Login"}
             </button>
+
+            {/* Register Link */}
+            <p className="text-sm text-gray-600 text-center">
+              Don't have an account?{" "}
+              <a
+                href="/register"
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate("/register", { state: { from: location.state?.from } });
+                }}
+                className="text-blue-600 hover:underline"
+              >
+                Register
+              </a>
+            </p>
           </form>
         </div>
       </section>
