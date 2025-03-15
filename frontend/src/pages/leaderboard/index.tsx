@@ -1,95 +1,143 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Sidebar from "../../components/Sidebar";
+import axios from "axios";
+import { BASE_URL2 } from "../../libs/constants";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 interface LeaderboardItem {
   rank: number;
   affiliate: string;
-  sales: number;
+  sales_count: number; // Updated to sales_count
 }
-
-const leaderboardData: LeaderboardItem[] = [
-  { rank: 1, affiliate: "John Doe", sales: 120 },
-  { rank: 2, affiliate: "Jane Smith", sales: 95 },
-  { rank: 3, affiliate: "Alice Johnson", sales: 87 },
-  { rank: 4, affiliate: "Michael Brown", sales: 78 },
-  { rank: 5, affiliate: "Emily Davis", sales: 65 },
-  // Add more leaderboard items as needed
-];
 
 const LeaderboardPage: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  
+  const [leaderboardData, setLeaderboardData] = useState<LeaderboardItem[]>([]);
+  const [leaderboardType, setLeaderboardType] = useState<"monthly" | "all_time">("monthly");
+  const [isLoading, setIsLoading] = useState(true);
+
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
+  // Fetch leaderboard data from the backend
+  useEffect(() => {
+    const fetchLeaderboardData = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        toast.error("Please log in to view the leaderboard.");
+        return;
+      }
+    
+      try {
+        const response = await axios.get(`${BASE_URL2}/api/affiliate/leaderboard/`, {
+          headers: {
+            Authorization: `Token ${token}`,
+          },
+          params: {
+            type: leaderboardType, // Pass the leaderboard type as a query parameter
+          },
+        });
+    
+        setLeaderboardData(response.data);
+      } catch (error) {
+        toast.error("Failed to fetch leaderboard data. Please try again.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchLeaderboardData();
+  }, [leaderboardType]);
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="text-center">
+          <div className="spinner-border animate-spin inline-block w-8 h-8 border-4 rounded-full" role="status">
+            <span className="visually-hidden"></span>
+          </div>
+          <p className="mt-2">Loading leaderboard...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex h-screen bg-gray-100">
-      {/* Hamburger Menu Button for Mobile */}
-      <button
-        onClick={toggleSidebar}
-        className="md:hidden fixed top-4 left-4 bg-gray-800 text-white p-2 rounded-md z-50"
-        aria-label="Toggle navigation menu"
-      >
-        <span className="material-icons text-xl">menu</span>
-      </button>
-      
       {/* Sidebar */}
       <Sidebar isOpen={isSidebarOpen} onClose={toggleSidebar} />
 
-
       {/* Main Content Area */}
-      <div className="flex-grow flex flex-col items-center justify-center p-4 md:p-8">
-        {/* Header */}
-        <h1 className="text-3xl font-bold text-purple-700 text-center mb-8">
-          Affiliate Leaderboard
-        </h1>
-        <p className="text-gray-600 text-center mb-4">
-          Ranked according to sales for the month
-        </p>
+      <div className="flex-grow p-4 md:p-8 overflow-y-auto ml-0 md:ml-64">
+        {/* Hamburger Menu Button (Mobile Only) */}
+        <button
+          onClick={toggleSidebar}
+          className="md:hidden p-2 bg-gray-800 text-white rounded-md mb-4"
+        >
+          <svg
+            className="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M4 6h16M4 12h16m-7 6h7"
+            ></path>
+          </svg>
+        </button>
+
+        <h1 className="text-2xl md:text-3xl font-bold mb-4">Affiliate Leaderboard</h1>
+
+        {/* Toggle Buttons */}
+        <div className="flex space-x-4 mb-4">
+          <button
+            onClick={() => setLeaderboardType("monthly")}
+            className={`px-4 py-2 rounded-md ${
+              leaderboardType === "monthly"
+                ? "bg-purple-700 text-white"
+                : "bg-gray-200 text-gray-700"
+            }`}
+          >
+            Monthly
+          </button>
+          <button
+            onClick={() => setLeaderboardType("all_time")}
+            className={`px-4 py-2 rounded-md ${
+              leaderboardType === "all_time"
+                ? "bg-purple-700 text-white"
+                : "bg-gray-200 text-gray-700"
+            }`}
+          >
+            All Time
+          </button>
+        </div>
 
         {/* Leaderboard Table */}
-        <div className="bg-white shadow-md rounded-lg w-full max-w-xl overflow-hidden">
-          <table className="w-full table-fixed">
-            <thead className="bg-gray-100">
+        <div className="bg-white shadow-md rounded-lg overflow-hidden">
+          <table className="min-w-full">
+            <thead className="bg-gray-50">
               <tr>
-                <th className="py-3 px-4 text-left font-medium text-gray-700">#</th>
-                <th className="py-3 px-4 text-left font-medium text-gray-700">
-                  Affiliate
-                </th>
-                <th className="py-3 px-4 text-right font-medium text-gray-700">
-                  Sales
-                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rank</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Affiliate</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Sales Count</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-gray-200">
               {leaderboardData.map((item) => (
-                <tr key={item.rank} className="border-b last:border-b-0">
-                  <td className="py-3 px-4 text-gray-700">{item.rank}</td>
-                  <td className="py-3 px-4 text-gray-700">{item.affiliate}</td>
-                  <td className="py-3 px-4 text-right text-gray-700">
-                    {item.sales}
-                  </td>
+                <tr key={item.rank}>
+                  <td className="px-6 py-4 whitespace-nowrap">{item.rank}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{item.affiliate}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-right">{item.sales_count}</td>
                 </tr>
               ))}
             </tbody>
           </table>
-        </div>
-
-        {/* Call to Action */}
-        <div className="mt-8 text-center">
-          <p className="text-gray-600">
-            Click{" "}
-            <a
-              href="https://twitter.com/profitplus"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-600 hover:underline"
-            >
-              here
-            </a>{" "}
-            to follow ProfitPlus on Twitter and stay updated.
-          </p>
         </div>
 
         {/* Footer */}
@@ -97,15 +145,16 @@ const LeaderboardPage: React.FC = () => {
           <p className="text-gray-500">
             For Support: Send a mail to{" "}
             <a
-              href="mailto:help@promptearn.com"
+              href="mailto:help@profitplus.com"
               className="text-blue-600 hover:underline"
             >
-              help@ProfitPlus.com
+              help@profitplus.com
             </a>
           </p>
           <p className="text-gray-500 mt-2">&copy; 2024, ProfitPlus</p>
         </footer>
       </div>
+      <ToastContainer />
     </div>
   );
 };
