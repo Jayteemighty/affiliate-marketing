@@ -11,6 +11,9 @@ from decimal import Decimal
 from django.db.models import Sum
 from courses.models import Course
 from payments.models import Withdrawal
+from django.db.models import Sum
+from django.utils import timezone
+from django.db.models import Count
 
 import logging
 logger = logging.getLogger(__name__)
@@ -149,3 +152,54 @@ class AffiliateSalesView(generics.ListAPIView):
     def get_queryset(self):
         affiliate = get_object_or_404(Affiliate, user=self.request.user)
         return Sale.objects.filter(vendor=affiliate.user)
+
+
+from rest_framework.response import Response
+from rest_framework import status
+from django.utils import timezone
+from django.db.models import Count
+from .models import Affiliate, Sale
+
+class AffiliateLeaderboardView(APIView):
+    """API to get the affiliate leaderboard."""
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        # Get the current month and year
+        now = timezone.now()
+        current_month = now.month
+        current_year = now.year
+
+        # Get the leaderboard type from the query parameters (default to 'all_time')
+        leaderboard_type = request.query_params.get('type', 'all_time')
+
+        # Filter sales based on the leaderboard type
+        if leaderboard_type == 'monthly':
+            # Filter sales for the current month
+            sales = Sale.objects.filter(
+                date__month=current_month,
+                date__year=current_year
+            )
+        else:
+            # Include all sales for all-time rankings
+            sales = Sale.objects.all()
+
+        # Count the number of sales by affiliate
+        affiliate_rankings = sales.values('affiliate_seller').annotate(
+            sales_count=Count('id')  # Count the number of sales
+        ).order_by('-sales_count')  # Order by sales count in descending order
+
+        # Get affiliate details for each ranking
+        rankings = []
+        for rank, data in enumerate(affiliate_rankings, start=1):
+            try:
+                affiliate = Affiliate.objects.get(user=data['affiliate_seller'])
+                rankings.append({
+                    'rank': rank,
+                    'affiliate': affiliate.user.email,  # Use affiliate's email or name
+                    'sales_count': data['sales_count'] or 0,  # Ensure sales_count is not None
+                })
+            except Affiliate.DoesNotExist:
+                continue  # Skip if the affiliate does not exist
+
+        return Response(rankings, status=status.HTTP_200_OK)
