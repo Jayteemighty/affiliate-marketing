@@ -16,4 +16,6 @@ urlpatterns = [
     # CourseRequest Endpoints
     path('course-requests/', views.CourseRequestListView.as_view(), name='course-request-list'),
     path('course-requests/create/', views.CourseRequestCreateView.as_view(), name='course-request-create'),
+    
+    path('user-products/', views.UserProductsView.as_view(), name='user-products'),
 ]

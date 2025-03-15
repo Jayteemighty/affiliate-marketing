@@ -1,4 +1,6 @@
 from rest_framework import generics, permissions
+from rest_framework.response import Response
+from rest_framework.views import APIView
 from .models import Course, Lesson, UserRegisteredCourse, CourseRequest
 from .serializers import CourseSerializer, LessonSerializer, UserRegisteredCourseSerializer, CourseRequestSerializer
 
@@ -6,7 +8,11 @@ from .serializers import CourseSerializer, LessonSerializer, UserRegisteredCours
 class CourseListView(generics.ListCreateAPIView):
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        # Only return courses owned by the logged-in user
+        return Course.objects.filter(instructor=self.request.user)
 
     def perform_create(self, serializer):
         if self.request.user.is_staff:  # Only admins can create courses
@@ -90,3 +96,24 @@ class CourseRequestCreateView(generics.CreateAPIView):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+
+class UserProductsView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        # Fetch courses owned by the user
+        courses = Course.objects.filter(instructor=request.user)
+        course_data = CourseSerializer(courses, many=True).data
+
+        # Fetch course requests made by the user
+        course_requests = CourseRequest.objects.filter(user=request.user)
+        course_request_data = CourseRequestSerializer(course_requests, many=True).data
+
+        # Combine the data
+        response_data = {
+            "courses": course_data,
+            "course_requests": course_request_data,
+        }
+
+        return Response(response_data)

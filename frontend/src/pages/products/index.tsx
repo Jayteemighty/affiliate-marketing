@@ -1,27 +1,79 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Sidebar from "../../components/Sidebar";
+import axios from "axios";
+import { BASE_URL2 } from "../../libs/constants";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-interface Product {
-  name: string;
-  launchDate: string;
-  status: string;
-  amount: number;
-  commission: number;
+interface Course {
+  id: number;
+  title: string;
+  price: number;
+  created_at: string;
+  is_approved: boolean;
+  seller_name: string;
+  commission_rate: number;
 }
 
-const productData: Product[] = [
-  { name: "Digital Marketing Mastery", launchDate: "2023-10-01", status: "Active", amount: 49.99, commission: 75 },
-  { name: "Forex Trading Essentials", launchDate: "2023-11-15", status: "Pending", amount: 99.99, commission: 60 },
-  { name: "3D Animation Basics", launchDate: "2024-01-01", status: "Inactive", amount: 79.99, commission: 50 },
-  // Add more products as needed
-];
+interface CourseRequest {
+  id: number;
+  course_title: string;
+  price: number;
+  created_at: string;
+  is_fulfilled: boolean;
+}
 
 const ProductsPage: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [courseRequests, setCourseRequests] = useState<CourseRequest[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
+
+  // Fetch courses and course requests from the backend
+  useEffect(() => {
+    const fetchUserProducts = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        toast.error("Please log in to view your products.");
+        return;
+      }
+
+      try {
+        const response = await axios.get(`${BASE_URL2}/api/courses/user-products/`, {
+          headers: {
+            Authorization: `Token ${token}`,
+          },
+        });
+
+        setCourses(response.data.courses);
+        setCourseRequests(response.data.course_requests);
+      } catch (error) {
+        console.error("Error fetching user products:", error);
+        toast.error("Failed to fetch products. Please try again.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchUserProducts();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="text-center">
+          <div className="spinner-border animate-spin inline-block w-8 h-8 border-4 rounded-full" role="status">
+            <span className="visually-hidden"></span>
+          </div>
+          <p className="mt-2">Loading products...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-screen bg-gray-100">
@@ -56,7 +108,7 @@ const ProductsPage: React.FC = () => {
           My Products
         </h1>
         <p className="text-gray-600 text-center mb-4">
-          View and manage your products listed on PromptEarn.
+          View and manage your products listed on ProfitPlus.
         </p>
 
         {/* Product Table */}
@@ -72,36 +124,61 @@ const ProductsPage: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {productData.length === 0 && (
+              {courses.length === 0 && courseRequests.length === 0 && (
                 <tr>
                   <td colSpan={5} className="py-4 text-center text-gray-600">
                     No products found.
                   </td>
                 </tr>
               )}
-              {productData.map((product, index) => (
-                <tr key={index} className="border-b last:border-b-0">
-                  <td className="py-3 px-4 text-gray-700">{product.name}</td>
-                  <td className="py-3 px-4 text-gray-700">{product.launchDate}</td>
+              {/* Display Courses */}
+              {courses.map((course) => (
+                <tr key={course.id} className="border-b last:border-b-0">
+                  <td className="py-3 px-4 text-gray-700">{course.title}</td>
+                  <td className="py-3 px-4 text-gray-700">
+                    {new Date(course.created_at).toLocaleDateString()}
+                  </td>
                   <td className="py-3 px-4 text-gray-700">
                     <span
                       className={`inline-block px-2 py-1 rounded-full ${
-                        product.status === "Active"
+                        course.is_approved
                           ? "bg-green-100 text-green-800"
-                          : product.status === "Pending"
-                          ? "bg-yellow-100 text-yellow-800"
-                          : "bg-red-100 text-red-800"
+                          : "bg-yellow-100 text-yellow-800"
                       }`}
                     >
-                      {product.status}
+                      {course.is_approved ? "Active" : "Pending"}
                     </span>
                   </td>
                   <td className="py-3 px-4 text-right text-gray-700">
-                    ${product.amount.toFixed(2)}
+                    ${course.price.toFixed(2)}
                   </td>
                   <td className="py-3 px-4 text-right text-gray-700">
-                    {product.commission}%
+                    {course.commission_rate}%
                   </td>
+                </tr>
+              ))}
+              {/* Display Course Requests */}
+              {courseRequests.map((request) => (
+                <tr key={request.id} className="border-b last:border-b-0">
+                  <td className="py-3 px-4 text-gray-700">{request.course_title}</td>
+                  <td className="py-3 px-4 text-gray-700">
+                    {new Date(request.created_at).toLocaleDateString()}
+                  </td>
+                  <td className="py-3 px-4 text-gray-700">
+                    <span
+                      className={`inline-block px-2 py-1 rounded-full ${
+                        request.is_fulfilled
+                          ? "bg-gray-100 text-gray-800"
+                          : "bg-yellow-100 text-yellow-800"
+                      }`}
+                    >
+                      {request.is_fulfilled ? "Inactive" : "Pending"}
+                    </span>
+                  </td>
+                  <td className="py-3 px-4 text-right text-gray-700">
+                    ${request.price.toFixed(2)}
+                  </td>
+                  <td className="py-3 px-4 text-right text-gray-700">40%</td>
                 </tr>
               ))}
             </tbody>
@@ -112,7 +189,7 @@ const ProductsPage: React.FC = () => {
         <div className="mt-8 text-center">
           <button
             className="bg-purple-700 text-white px-6 py-3 rounded-md hover:bg-purple-800 transition duration-300"
-            onClick={() => (window.location.href = "/upload-course")}
+            onClick={() => (window.location.href = "/become-vendor")}
           >
             Add New Product
           </button>
