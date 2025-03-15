@@ -1,120 +1,241 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Sidebar from "../../components/Sidebar";
+import axios from "axios";
+import { BASE_URL2 } from "../../libs/constants";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
+interface TransactionData {
+  user_payments: {
+    id: number;
+    amount: number;
+    status: string;
+    created_at: string;
+  }[];
+  course_payments: {
+    id: number;
+    amount: number;
+    status: string;
+    created_at: string;
+  }[];
+  affiliate_sales: {
+    id: number;
+    amount: number;
+    commission: number;
+    date: string;
+  }[];
+  withdrawal_requests: {
+    id: number;
+    amount: number;
+    status: string;
+    created_at: string;
+  }[];
+}
 
 const TransactionStatusPage: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [transactionData, setTransactionData] = useState<TransactionData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
-  const [email, setEmail] = useState("");
-  const [status, setStatus] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  // Function to handle transaction status check
-  const handleCheckStatus = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email.trim()) {
-      setError("Please enter a valid email address.");
-      setStatus(null);
-      return;
-    }
-    try {
-      const response = await fetch("https://profitplusbackend.com.ng/api/check-transaction", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        setError(errorData.message || "Failed to check transaction status.");
-        setStatus(null);
+  // Fetch transaction data from the backend
+  useEffect(() => {
+    const fetchTransactionData = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        toast.error("Please log in to view your transaction status.");
         return;
       }
 
-      const data = await response.json();
-      setStatus(data.status || "No transactions found.");
-      setError(null);
-    } catch (error) {
-      console.error("Error checking transaction status:", error);
-      setError("An unexpected error occurred. Please try again later.");
-      setStatus(null);
-    }
-  };
+      try {
+        const response = await axios.get(`${BASE_URL2}/api/payment/transaction-status/`, {
+          headers: {
+            Authorization: `Token ${token}`,
+          },
+        });
+
+        setTransactionData(response.data);
+      } catch (error) {
+        toast.error("Failed to fetch transaction data. Please try again.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchTransactionData();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="text-center">
+          <div className="spinner-border animate-spin inline-block w-8 h-8 border-4 rounded-full" role="status">
+            <span className="visually-hidden"></span>
+          </div>
+          <p className="mt-2">Loading transaction status...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!transactionData) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <p className="text-red-500">Failed to load transaction data.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-screen bg-gray-100">
-      {/* Hamburger Menu Button for Mobile */}
-      <button
-        onClick={toggleSidebar}
-        className="md:hidden fixed top-4 left-4 bg-gray-800 text-white p-2 rounded-md z-50"
-        aria-label="Toggle navigation menu"
-      >
-        <span className="material-icons text-xl">menu</span>
-      </button>
-
       {/* Sidebar */}
       <Sidebar isOpen={isSidebarOpen} onClose={toggleSidebar} />
 
       {/* Main Content Area */}
-      <div className="flex-grow flex flex-col items-center justify-center p-4 md:p-8">
-        {/* Header */}
-        <h1 className="text-3xl font-bold text-purple-700 text-center mb-8">
-          Check Transaction Status
-        </h1>
-
-        {/* Form Section */}
-        <form
-          onSubmit={handleCheckStatus}
-          className="bg-white shadow-md rounded-lg p-6 w-full max-w-md space-y-4"
+      <div className="flex-grow p-4 md:p-8 overflow-y-auto ml-0 md:ml-64">
+        {/* Hamburger Menu Button (Mobile Only) */}
+        <button
+          onClick={toggleSidebar}
+          className="md:hidden p-2 bg-gray-800 text-white rounded-md mb-4"
         >
-          <label className="block text-gray-700 font-medium mb-2">
-            Type Buyer Email:
-          </label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Enter buyer's email"
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-200"
-          />
-          <button
-            type="submit"
-            className="w-full bg-purple-700 text-white px-4 py-2 rounded-md hover:bg-purple-800 transition duration-300"
+          <svg
+            className="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
           >
-            Check
-          </button>
-        </form>
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M4 6h16M4 12h16m-7 6h7"
+            ></path>
+          </svg>
+        </button>
 
-        {/* Status or Error Message */}
-        {status && (
-          <div className="bg-green-100 text-green-800 p-4 rounded-md mt-4 w-full max-w-md text-center">
-            {status}
-          </div>
-        )}
-        {error && (
-          <div className="bg-red-100 text-red-800 p-4 rounded-md mt-4 w-full max-w-md text-center">
-            {error}
-          </div>
-        )}
+        <h1 className="text-2xl md:text-3xl font-bold mb-4">Transaction Status</h1>
 
-        {/* Footer */}
-        <footer className="mt-12 text-center w-full max-w-md">
-          <p className="text-gray-500">
-            For Support: Send a mail to{" "}
-            <a
-              href="mailto:help@profitplus.com"
-              className="text-blue-600 hover:underline"
-            >
-              help@profitplus.com
-            </a>
-          </p>
-          <p className="text-gray-500 mt-2">&copy; 2024, Profitplus</p>
-        </footer>
+        {/* User Payments Table */}
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold mb-4">Your Payments</h2>
+          {transactionData.user_payments.length > 0 ? (
+            <div className="bg-white shadow-md rounded-lg overflow-hidden">
+              <table className="min-w-full">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {transactionData.user_payments.map((payment) => (
+                    <tr key={payment.id}>
+                      <td className="px-6 py-4 whitespace-nowrap">₦{payment.amount}</td>
+                      <td className="px-6 py-4 whitespace-nowrap">{payment.status}</td>
+                      <td className="px-6 py-4 whitespace-nowrap">{new Date(payment.created_at).toLocaleString()}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <p className="text-gray-600">No payments found.</p>
+          )}
+        </div>
+
+        {/* Course Payments Table */}
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold mb-4">Payments for Your Courses</h2>
+          {transactionData.course_payments.length > 0 ? (
+            <div className="bg-white shadow-md rounded-lg overflow-hidden">
+              <table className="min-w-full">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {transactionData.course_payments.map((payment) => (
+                    <tr key={payment.id}>
+                      <td className="px-6 py-4 whitespace-nowrap">₦{payment.amount}</td>
+                      <td className="px-6 py-4 whitespace-nowrap">{payment.status}</td>
+                      <td className="px-6 py-4 whitespace-nowrap">{new Date(payment.created_at).toLocaleString()}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <p className="text-gray-600">No course payments found.</p>
+          )}
+        </div>
+
+        {/* Affiliate Sales Table */}
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold mb-4">Affiliate Sales</h2>
+          {transactionData.affiliate_sales.length > 0 ? (
+            <div className="bg-white shadow-md rounded-lg overflow-hidden">
+              <table className="min-w-full">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Commission</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {transactionData.affiliate_sales.map((sale) => (
+                    <tr key={sale.id}>
+                      <td className="px-6 py-4 whitespace-nowrap">₦{sale.amount}</td>
+                      <td className="px-6 py-4 whitespace-nowrap">₦{sale.commission}</td>
+                      <td className="px-6 py-4 whitespace-nowrap">{new Date(sale.date).toLocaleString()}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <p className="text-gray-600">No affiliate sales found.</p>
+          )}
+        </div>
+
+        {/* Withdrawal Requests Table */}
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold mb-4">Withdrawal Requests</h2>
+          {transactionData.withdrawal_requests.length > 0 ? (
+            <div className="bg-white shadow-md rounded-lg overflow-hidden">
+              <table className="min-w-full">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {transactionData.withdrawal_requests.map((request) => (
+                    <tr key={request.id}>
+                      <td className="px-6 py-4 whitespace-nowrap">₦{request.amount}</td>
+                      <td className="px-6 py-4 whitespace-nowrap">{request.status}</td>
+                      <td className="px-6 py-4 whitespace-nowrap">{new Date(request.created_at).toLocaleString()}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <p className="text-gray-600">No withdrawal requests found.</p>
+          )}
+        </div>
       </div>
+      <ToastContainer />
     </div>
   );
 };
