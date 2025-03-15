@@ -3,8 +3,9 @@ import DefaultLayout from "../../../layouts/DefaultLayout";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import Preloader from "../../../components/Preloader"; // Import the Preloader
-import { BASE_URL2 } from "../../../libs/constants"; // Import the base URL
+import Preloader from "../../../components/Preloader";
+import { BASE_URL2 } from "../../../libs/constants";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const SignUpPage: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -17,6 +18,8 @@ const SignUpPage: React.FC = () => {
   });
   const [termsChecked, setTermsChecked] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false); // Loading state
+  const location = useLocation();
+  const navigate = useNavigate();
 
   // Handle input changes
   const handleChange = (
@@ -104,10 +107,9 @@ const SignUpPage: React.FC = () => {
         toast.success("Account created successfully. Check your email for a welcome message.");
         localStorage.setItem("user", JSON.stringify(response.data));
   
-        // Redirect after 3 seconds
-        setTimeout(() => {
-          window.location.href = "/dashboard"; // Replace with your desired redirect path
-        }, 3000);
+        // Redirect to the referral link URL or dashboard
+        const from = location.state?.from || "/dashboard";
+        navigate(from); // Redirect to the stored URL or dashboard
       }
     } catch (error) {
       // Handle errors
