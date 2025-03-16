@@ -200,6 +200,16 @@ class WithdrawalRequestView(generics.CreateAPIView):
         serializer.save(user=user)
 
 
+class WithdrawalListView(generics.ListAPIView):
+    """API to list withdrawal requests for the logged-in user."""
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = WithdrawalRequestSerializer
+
+    def get_queryset(self):
+        # Return withdrawal requests for the logged-in user
+        return WithdrawalRequest.objects.filter(user=self.request.user)
+
+
 class DummySuccessPageView(APIView):
     """Dummy success page for testing."""
     def get(self, request):
