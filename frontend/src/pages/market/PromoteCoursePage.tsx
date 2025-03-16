@@ -17,7 +17,6 @@ const PromoteCoursePage: React.FC = () => {
   const [course, setCourse] = useState<Course | null>(null);
   const [affiliateLink, setAffiliateLink] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-//   const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const toggleSidebar = () => {
@@ -105,6 +104,21 @@ const PromoteCoursePage: React.FC = () => {
       <div className="flex-grow overflow-y-auto ml-0 md:ml-64">
         <div className="p-6 max-w-4xl mx-auto">
           <h1 className="text-3xl font-bold mb-6 text-gray-800">Promote Course: {course.title}</h1>
+
+          {/* Instructions Section */}
+          <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6 rounded-lg">
+            <h2 className="text-lg font-semibold text-blue-800 mb-2">How to Use Your Referral Link</h2>
+            <p className="text-gray-700">
+              To refer someone to this course:
+              <ol className="list-decimal list-inside mt-2 space-y-2">
+                <li>Log out of your account.</li>
+                <li>Share the referral link with the person you want to refer.</li>
+                <li>Ask them to paste the link into their browser.</li>
+                <li>They will be redirected to the login or registration page.</li>
+                <li>After logging in or registering, they will automatically be redirected to this course.</li>
+              </ol>
+            </p>
+          </div>
 
           {/* Referral Link Section */}
           <div className="bg-white shadow-md rounded-lg p-6 mb-6">
