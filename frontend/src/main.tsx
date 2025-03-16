@@ -24,6 +24,7 @@ import PaymentSuccessPage from "./pages/payment/success";
 import PaymentFailurePage from "./pages/payment/failure";
 import PromoteCoursePage from "./pages/market/PromoteCoursePage";
 import WithdrawalRequestPage from "./pages/withdraw/WithdrawalRequestPage";
+import ForgotPasswordPage from "./pages/authentication/forgot-password/ForgotPassword";
 
 import "./index.css";
 
@@ -55,6 +56,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         <Route path="/payment/failure" element={<PaymentFailurePage />} />
         <Route path="/market/promote/:courseId" element={<PromoteCoursePage />} />
         <Route path="/withdrawal-request" element={<WithdrawalRequestPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         {/* Add more routes here */}
       </Routes>
     </BrowserRouter>

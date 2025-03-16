@@ -282,6 +282,22 @@ const SignUpPage: React.FC = () => {
             >
               {isLoading ? "Creating Account..." : "Create Account"}
             </button>
+
+            {/* Forgot Password Link */}
+            <p className="text-sm text-gray-600 text-center">
+              Forgot your password?{" "}
+              <a
+                href="/forgot-password"
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate("/forgot-password");
+                }}
+                className="text-blue-600 hover:underline"
+              >
+                Reset it here
+              </a>
+            </p>
+
             {/* Login Link */}
             <p className="text-sm text-gray-600 text-center">
               Do you have an account?{" "}

@@ -1,77 +1,197 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Sidebar from "../../components/Sidebar";
+import axios from "axios";
+import { BASE_URL2 } from "../../libs/constants";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import Preloader from "../../components/Preloader";
+import Modal from "../../components/Modal"; // A reusable modal component
 
-interface Bank {
-  value: string;
-  label: string;
+interface UserDetails {
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone_number: string;
 }
 
-const banks: Bank[] = [
-  { value: "first-bank", label: "First Bank of Nigeria" },
-  { value: "kuda", label: "Kuda" },
-  { value: "zenith", label: "Zenith Bank" },
-  { value: "access", label: "Access Bank" },
-  { value: "gtbank", label: "GT Bank Plc" },
-  // Add more banks as needed
-];
+interface Course {
+  id: number;
+  title: string;
+  description: string;
+}
 
 const ProfilePage: React.FC = () => {
-  const [formData, setFormData] = useState({
-    name: "",
+  const [userDetails, setUserDetails] = useState<UserDetails>({
+    first_name: "",
+    last_name: "",
     email: "",
-    whatsapp: "",
-    country: "",
-    bank: "",
-    accountNumber: "",
-    mobileMoneyAccountName: "",
-    bankAccountName: "",
+    phone_number: "",
   });
-
-  const [isUpdating, setIsUpdating] = useState(false);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
-  // Handle form input changes
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  // Handle profile update submission
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsUpdating(true);
-
-    try {
-      const response = await fetch("https://profitplusbackend.com.ng/api/update-profile", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to update profile.");
-      }
-
-      const data = await response.json();
-      alert(data.message || "Profile updated successfully!");
-    } catch (error) {
-      if (error instanceof Error) {
-        console.error("Error updating profile:", error.message);
-        alert("An error occurred while updating your profile. Please try again.");
-      } else {
-        console.error("An unknown error occurred:", error);
-        alert("An unknown error occurred. Please try again.");
-      }
-    } finally {
-      setIsUpdating(false);
-    }
-  };
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
+  const [isEmailModalOpen, setIsEmailModalOpen] = useState<boolean>(false);
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState<boolean>(false);
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
+  };
+
+  // Fetch user details and registered courses
+  useEffect(() => {
+    const fetchData = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        toast.error("Please log in to view your profile.");
+        return;
+      }
+
+      setIsLoading(true);
+
+      try {
+        // Fetch user details
+        const userResponse = await axios.get(`${BASE_URL2}/api/user/account/details/`, {
+          headers: {
+            Authorization: `Token ${token}`,
+          },
+        });
+        setUserDetails(userResponse.data);
+
+        // Fetch registered courses
+        const coursesResponse = await axios.get(`${BASE_URL2}/api/course/user-registered-courses/`, {
+          headers: {
+            Authorization: `Token ${token}`,
+          },
+        });
+        setCourses(coursesResponse.data);
+      } catch (error) {
+        if (axios.isAxiosError(error)) {
+          toast.error(error.response?.data.error || "Failed to fetch data.");
+        } else {
+          toast.error("An unexpected error occurred.");
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // Handle updating user details
+  const handleUpdateDetails = async (updatedDetails: Partial<UserDetails>) => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      toast.error("Please log in to update your details.");
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const response = await axios.patch(
+        `${BASE_URL2}/api/user/account/details/`,
+        updatedDetails,
+        {
+          headers: {
+            Authorization: `Token ${token}`,
+          },
+        }
+      );
+
+      setUserDetails(response.data);
+      toast.success("Details updated successfully!");
+      setIsEditModalOpen(false);
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        toast.error(error.response?.data.error || "Failed to update details.");
+      } else {
+        toast.error("An unexpected error occurred.");
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Handle changing email
+  const handleChangeEmail = async (newEmail: string) => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      toast.error("Please log in to change your email.");
+      return;
+    }
+  
+    setIsLoading(true);
+  
+    try {
+      // Remove the unused `response` variable
+      await axios.patch(
+        `${BASE_URL2}/api/user/account/email/change/`,
+        { email: newEmail },
+        {
+          headers: {
+            Authorization: `Token ${token}`,
+          },
+        }
+      );
+  
+      setUserDetails((prev) => ({ ...prev, email: newEmail }));
+      toast.success("Email changed successfully!");
+      setIsEmailModalOpen(false);
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        toast.error(error.response?.data.error || "Failed to change email.");
+      } else {
+        toast.error("An unexpected error occurred.");
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Handle changing password
+  const handleChangePassword = async (currentPassword: string, newPassword: string, confirmPassword: string) => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      toast.error("Please log in to change your password.");
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      toast.error("Passwords do not match.");
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      await axios.patch(
+        `${BASE_URL2}/api/user/account/password/change/`,
+        {
+          email: userDetails.email,
+          password: currentPassword,
+          new_password: newPassword,
+          confirm_password: confirmPassword,
+        },
+        {
+          headers: {
+            Authorization: `Token ${token}`,
+          },
+        }
+      );
+
+      toast.success("Password changed successfully!");
+      setIsPasswordModalOpen(false);
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        toast.error(error.response?.data.error || "Failed to change password.");
+      } else {
+        toast.error("An unexpected error occurred.");
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -84,198 +204,166 @@ const ProfilePage: React.FC = () => {
       >
         <span className="material-icons text-xl">menu</span>
       </button>
-      
+
       {/* Sidebar */}
       <Sidebar isOpen={isSidebarOpen} onClose={toggleSidebar} />
 
       {/* Main Content Area */}
-      <div className="flex-grow flex flex-col items-center justify-center p-4 md:p-8">
+      <div className="flex-grow p-4 md:p-8 overflow-y-auto ml-0 md:ml-64">
         {/* Header */}
-        <h1 className="text-3xl font-bold text-purple-700 text-center mb-8">
-          My Profile
-        </h1>
-        <p className="text-gray-600 text-center mb-4">
-          Update your personal and banking details here.
-        </p>
+        <h1 className="text-2xl md:text-3xl font-bold mb-8">My Profile</h1>
 
-        {/* Profile Form */}
-        <form
-          onSubmit={handleSubmit}
-          className="bg-white shadow-md rounded-lg w-full max-w-xl p-6 space-y-4"
-        >
-          {/* Name Field */}
-          <div>
-            <label className="block text-gray-700 font-medium mb-2">Name</label>
+        {/* User Details Section */}
+        <div className="bg-white shadow-md rounded-lg p-6 mb-8">
+          <h2 className="text-xl font-semibold mb-4">Personal Details</h2>
+          <div className="space-y-4">
+            <p><strong>Name:</strong> {userDetails.first_name} {userDetails.last_name}</p>
+            <p><strong>Email:</strong> {userDetails.email}</p>
+            <p><strong>Phone:</strong> {userDetails.phone_number}</p>
+          </div>
+          <button
+            onClick={() => setIsEditModalOpen(true)}
+            className="mt-4 bg-purple-700 text-white px-4 py-2 rounded-md hover:bg-purple-800 transition duration-300"
+          >
+            Edit Details
+          </button>
+        </div>
+
+        {/* Registered Courses Section */}
+        <div className="bg-white shadow-md rounded-lg p-6 mb-8">
+          <h2 className="text-xl font-semibold mb-4">Registered Courses</h2>
+          {courses.length === 0 ? (
+            <p>No courses registered yet.</p>
+          ) : (
+            <div className="space-y-4">
+              {courses.map((course) => (
+                <div key={course.id} className="border-b pb-4">
+                  <h3 className="font-semibold">{course.title}</h3>
+                  <p className="text-gray-600">{course.description}</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Change Email and Password Buttons */}
+        <div className="flex space-x-4">
+          <button
+            onClick={() => setIsEmailModalOpen(true)}
+            className="bg-purple-700 text-white px-4 py-2 rounded-md hover:bg-purple-800 transition duration-300"
+          >
+            Change Email
+          </button>
+          <button
+            onClick={() => setIsPasswordModalOpen(true)}
+            className="bg-purple-700 text-white px-4 py-2 rounded-md hover:bg-purple-800 transition duration-300"
+          >
+            Change Password
+          </button>
+        </div>
+
+        {/* Modals */}
+        <Modal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)}>
+          <h2 className="text-xl font-semibold mb-4">Edit Details</h2>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              const formData = new FormData(e.target as HTMLFormElement);
+              handleUpdateDetails({
+                first_name: formData.get("first_name") as string,
+                last_name: formData.get("last_name") as string,
+                phone_number: formData.get("phone_number") as string,
+              });
+            }}
+            className="space-y-4"
+          >
             <input
               type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleInputChange}
-              placeholder="Enter your full name"
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-200"
+              name="first_name"
+              defaultValue={userDetails.first_name}
+              placeholder="First Name"
+              className="w-full px-4 py-2 border border-gray-300 rounded-md"
             />
-          </div>
+            <input
+              type="text"
+              name="last_name"
+              defaultValue={userDetails.last_name}
+              placeholder="Last Name"
+              className="w-full px-4 py-2 border border-gray-300 rounded-md"
+            />
+            <input
+              type="text"
+              name="phone_number"
+              defaultValue={userDetails.phone_number}
+              placeholder="Phone Number"
+              className="w-full px-4 py-2 border border-gray-300 rounded-md"
+            />
+            <button
+              type="submit"
+              className="w-full bg-purple-700 text-white px-4 py-2 rounded-md hover:bg-purple-800 transition duration-300"
+            >
+              Save Changes
+            </button>
+          </form>
+        </Modal>
 
-          {/* Email Field */}
-          <div>
-            <label className="block text-gray-700 font-medium mb-2">Email</label>
+        <Modal isOpen={isEmailModalOpen} onClose={() => setIsEmailModalOpen(false)}>
+          <h2 className="text-xl font-semibold mb-4">Change Email</h2>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              const formData = new FormData(e.target as HTMLFormElement);
+              handleChangeEmail(formData.get("email") as string);
+            }}
+            className="space-y-4"
+          >
             <input
               type="email"
               name="email"
-              value={formData.email}
-              onChange={handleInputChange}
-              placeholder="Enter your email address"
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-200"
+              placeholder="New Email"
+              className="w-full px-4 py-2 border border-gray-300 rounded-md"
             />
-          </div>
-
-          {/* WhatsApp Phone Number Field */}
-          <div>
-            <label className="block text-gray-700 font-medium mb-2">
-              WhatsApp Phone Number
-            </label>
-            <input
-              type="tel"
-              name="whatsapp"
-              value={formData.whatsapp}
-              onChange={handleInputChange}
-              placeholder="Enter your WhatsApp number"
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-200"
-            />
-          </div>
-
-          {/* Country Field */}
-          <div>
-            <label className="block text-gray-700 font-medium mb-2">Country</label>
-            <input
-              type="text"
-              name="country"
-              value={formData.country}
-              onChange={handleInputChange}
-              placeholder="Enter your country"
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-200"
-            />
-          </div>
-
-          {/* Bank Selection Field */}
-          <div>
-            <label className="block text-gray-700 font-medium mb-2">Bank</label>
-            <select
-              name="bank"
-              value={formData.bank}
-              onChange={handleInputChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-200"
+            <button
+              type="submit"
+              className="w-full bg-purple-700 text-white px-4 py-2 rounded-md hover:bg-purple-800 transition duration-300"
             >
-              <option value="" disabled>
-                Select Bank
-              </option>
-              {banks.map((bank) => (
-                <option key={bank.value} value={bank.value}>
-                  {bank.label}
-                </option>
-              ))}
-            </select>
-          </div>
+              Change Email
+            </button>
+          </form>
+        </Modal>
 
-          {/* Account Number Field */}
-          <div>
-            <label className="block text-gray-700 font-medium mb-2">
-              Account Number
-            </label>
-            <input
-              type="text"
-              name="accountNumber"
-              value={formData.accountNumber}
-              onChange={handleInputChange}
-              placeholder="Enter your account number"
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-200"
-            />
-          </div>
-
-          {/* Mobile Money Account Name Field */}
-          <div>
-            <label className="block text-gray-700 font-medium mb-2">
-              Mobile Money Account Name
-            </label>
-            <input
-              type="text"
-              name="mobileMoneyAccountName"
-              value={formData.mobileMoneyAccountName}
-              onChange={handleInputChange}
-              placeholder="Enter your mobile money account name"
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-200"
-            />
-          </div>
-
-          {/* Bank Account Name Field */}
-          <div>
-            <label className="block text-gray-700 font-medium mb-2">
-              Bank Account Name
-            </label>
-            <input
-              type="text"
-              name="bankAccountName"
-              value={formData.bankAccountName}
-              onChange={handleInputChange}
-              placeholder="Enter your bank account name"
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-200"
-            />
-          </div>
-
-          {/* Update Button */}
-          <button
-            type="submit"
-            className="w-full bg-purple-700 text-white px-4 py-2 rounded-md hover:bg-purple-800 transition duration-300"
-            disabled={isUpdating}
+        <Modal isOpen={isPasswordModalOpen} onClose={() => setIsPasswordModalOpen(false)}>
+          <h2 className="text-xl font-semibold mb-4">Change Password</h2>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              const formData = new FormData(e.target as HTMLFormElement);
+              handleChangePassword(
+                formData.get("currentPassword") as string,
+                formData.get("newPassword") as string,
+                formData.get("confirmPassword") as string
+              );
+            }}
+            className="space-y-4"
           >
-            {isUpdating ? "Updating..." : "Update Info"}
-          </button>
-        </form>
-
-        {/* Change Password Section */}
-        <section className="mt-8 bg-white shadow-md rounded-lg w-full max-w-xl p-6">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">Change Password</h2>
-          <form className="space-y-4">
-            {/* Current Password Field */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                Current Password
-              </label>
-              <input
-                type="password"
-                name="currentPassword"
-                placeholder="Enter your current password"
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-200"
-              />
-            </div>
-
-            {/* New Password Field */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                New Password
-              </label>
-              <input
-                type="password"
-                name="newPassword"
-                placeholder="Enter your new password"
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-200"
-              />
-            </div>
-
-            {/* Confirm Password Field */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                Confirm Password
-              </label>
-              <input
-                type="password"
-                name="confirmPassword"
-                placeholder="Confirm your new password"
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-200"
-              />
-            </div>
-
-            {/* Submit Button */}
+            <input
+              type="password"
+              name="currentPassword"
+              placeholder="Current Password"
+              className="w-full px-4 py-2 border border-gray-300 rounded-md"
+            />
+            <input
+              type="password"
+              name="newPassword"
+              placeholder="New Password"
+              className="w-full px-4 py-2 border border-gray-300 rounded-md"
+            />
+            <input
+              type="password"
+              name="confirmPassword"
+              placeholder="Confirm Password"
+              className="w-full px-4 py-2 border border-gray-300 rounded-md"
+            />
             <button
               type="submit"
               className="w-full bg-purple-700 text-white px-4 py-2 rounded-md hover:bg-purple-800 transition duration-300"
@@ -283,22 +371,28 @@ const ProfilePage: React.FC = () => {
               Change Password
             </button>
           </form>
-        </section>
+        </Modal>
 
         {/* Footer */}
-        <footer className="mt-12 text-center w-full max-w-xl">
+        <footer className="mt-12 text-center">
           <p className="text-gray-500">
             For Support: Send a mail to{" "}
             <a
-              href="mailto:help@promptearn.com"
+              href="mailto:help@profitplus.com"
               className="text-blue-600 hover:underline"
             >
-              help@promptearn.com
+              help@profitplus.com
             </a>
           </p>
-          <p className="text-gray-500 mt-2">&copy; 2024, PromptEarn</p>
+          <p className="text-gray-500 mt-2">&copy; 2024, ProfitPlus</p>
         </footer>
       </div>
+
+      {/* Preloader */}
+      {isLoading && <Preloader />}
+
+      {/* Toast Notifications */}
+      <ToastContainer />
     </div>
   );
 };

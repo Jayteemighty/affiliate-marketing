@@ -1,21 +1,18 @@
 import os, random
 from dotenv import load_dotenv
 from pathlib import Path
-
 from django.shortcuts import redirect, render
 from django.contrib.auth import get_user_model
 from django.conf import settings
-
 # import requests
 import datetime
 from rest_framework.views import APIView
 from rest_framework import generics, status
 from rest_framework.response import Response
+from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.parsers import MultiPartParser
 from rest_framework.authtoken.models import Token
-
-
 from . import serializers
 from .models import OTP
 from .util import Util
@@ -160,82 +157,6 @@ class RegisteredView(generics.GenericAPIView):
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return Response({'message': 'Account created successfully. Check your email for a welcome message.'}, status=status.HTTP_201_CREATED)
-
-
-
-class RegisterView(generics.GenericAPIView):
-    '''View to register users'''
-
-    serializer_class = serializers.CreateAccountSerializer
-    # parser_classes = [MultiPartParser]
-    permission_classes = [AllowAny]
-    queryset = User.objects.all()
-    
-    def post(self, request):
-        serializer = self.serializer_class(data=request.data)
-        
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        
-        try:
-            send_verification_email(email=serializer.data['email'])
-            
-        except Exception as e:
-            return Response({
-                'exception': f'{e}',
-                'error': 'could not send emailAn error occured. Try again later',
-            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
- 
-
-class VerifyAccountView(generics.GenericAPIView):
-    '''View to verify account'''
-    
-    authentication_classes = []
-    permission_classes = []
-    serializer_class = serializers.VerifyAccountSerializer
-    
-    def post(self, request):
-        serializer = self.serializer_class(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        
-        user = User.objects.get(email=serializer.data['email'])
-        
-        user.is_verified = True
-        user.save()
-        
-        return Response({'message': 'Account verified successfully'}, status=status.HTTP_200_OK)
-            
-
-class ResendVerificationEmailView(generics.GenericAPIView):
-    '''View to resend verification email'''
-    
-    serializer_class = serializers.SendOTPSerializer
-    permission_classes = []
-    authentication_classes = []
-    
-    def post(self, request):
-        serializer = self.serializer_class(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        
-        try:
-            user = User.objects.get(email=serializer.data['email'])
-            if user.is_verified:
-                return Response({'error': 'You have been verified already'}, status=status.HTTP_400_BAD_REQUEST)
-            
-            send_verification_email(email=serializer.data['email'])
-            
-        except Exception as e:
-            return Response({
-                'exception': f'{e}',
-                'error': 'An error occured. Try again later',
-            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
-        return Response({
-            'message': f"Verification email sent successfully. Check {serializer.data['email']} for an OTP"},
-            status=status.HTTP_201_CREATED
-        )
     
 
 class LoginView(generics.GenericAPIView):
@@ -283,7 +204,7 @@ class ChangeEmailView(generics.UpdateAPIView):
             user = User.objects.get(id=self.request.user.id)
                         
             # Make user unverifed because of change in email
-            user.is_verified = False
+            # user.is_verified = False
             user.save()            
             
         except Exception as e:
@@ -343,22 +264,28 @@ class VerifyPasswordResetView(generics.GenericAPIView):
         return Response({'message': 'Proceed to change your password'}, status=status.HTTP_200_OK)
      
      
-# TODO: Fix bug with this view
 class PasswordResetView(generics.UpdateAPIView):
-    '''View for a user to request for a password reset'''
-    
+    '''View for a user to request a password reset'''
+
     permission_classes = []
     authentication_classes = []
     serializer_class = serializers.PasswordResetSerializer
-    
-    def get_queryset(self):
-        serializer = self.serializer_class(data=self.request.data)
-        serializer.is_valid(raise_exception=True)
-        
-        return User.objects.get(email=serializer.data['email'])
+
+    def get_object(self):
+        email = self.request.data.get('email')
+        if not email:
+            raise ValidationError({'error': 'Email field is required.'}, code=status.HTTP_400_BAD_REQUEST)
+        try:
+            return User.objects.get(email=email)
+        except User.DoesNotExist:
+            raise ValidationError({'error': 'User with this email does not exist.'}, code=status.HTTP_404_NOT_FOUND)
     
     def update(self, request, *args, **kwargs):
-        super().update(request, *args, **kwargs)
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
         return Response({'message': 'Password changed successfully'}, status=status.HTTP_200_OK)
     
 
