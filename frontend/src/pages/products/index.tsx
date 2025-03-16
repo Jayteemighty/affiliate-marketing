@@ -41,14 +41,14 @@ const ProductsPage: React.FC = () => {
         toast.error("Please log in to view your products.");
         return;
       }
-
+  
       try {
-        const response = await axios.get(`${BASE_URL2}/api/courses/user-products/`, {
+        const response = await axios.get(`${BASE_URL2}/user-products/`, {
           headers: {
             Authorization: `Token ${token}`,
           },
         });
-
+  
         setCourses(response.data.courses);
         setCourseRequests(response.data.course_requests);
       } catch (error) {
@@ -58,7 +58,7 @@ const ProductsPage: React.FC = () => {
         setIsLoading(false);
       }
     };
-
+  
     fetchUserProducts();
   }, []);
 
@@ -157,7 +157,7 @@ const ProductsPage: React.FC = () => {
                   </td>
                 </tr>
               ))}
-              {/* Display Course Requests */}
+
               {courseRequests.map((request) => (
                 <tr key={request.id} className="border-b last:border-b-0">
                   <td className="py-3 px-4 text-gray-700">{request.course_title}</td>

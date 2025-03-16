@@ -23,6 +23,7 @@ import CourseAffiliatePage from "./pages/market/affiliate/[courseId]/[uniqueToke
 import PaymentSuccessPage from "./pages/payment/success";
 import PaymentFailurePage from "./pages/payment/failure";
 import PromoteCoursePage from "./pages/market/PromoteCoursePage";
+import WithdrawalRequestPage from "./pages/withdraw/WithdrawalRequestPage";
 
 import "./index.css";
 
@@ -53,6 +54,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         <Route path="/payment/success" element={<PaymentSuccessPage />} />
         <Route path="/payment/failure" element={<PaymentFailurePage />} />
         <Route path="/market/promote/:courseId" element={<PromoteCoursePage />} />
+        <Route path="/withdrawal-request" element={<WithdrawalRequestPage />} />
         {/* Add more routes here */}
       </Routes>
     </BrowserRouter>

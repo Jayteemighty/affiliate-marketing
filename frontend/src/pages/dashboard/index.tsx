@@ -5,6 +5,7 @@ import { BASE_URL2 } from "../../libs/constants";
 import Preloader from "../../components/Preloader";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useNavigate } from "react-router-dom";
 
 interface AffiliateData {
   today_sales: number;
@@ -28,6 +29,9 @@ const DashboardPage: React.FC = () => {
   const [currency, setCurrency] = useState("1"); // Default currency value
   const [affiliateData, setAffiliateData] = useState<AffiliateData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
+  const [affiliateWithdrawalAmount, setAffiliateWithdrawalAmount] = useState("");
+  const [vendorWithdrawalAmount, setVendorWithdrawalAmount] = useState("");
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -36,6 +40,42 @@ const DashboardPage: React.FC = () => {
   const handleCurrencyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setCurrency(e.target.value);
   };
+
+  const handleAffiliateWithdrawalAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setAffiliateWithdrawalAmount(e.target.value);
+  };
+  
+  const handleVendorWithdrawalAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setVendorWithdrawalAmount(e.target.value);
+  };
+
+  // Handle withdrawal amount input
+  const handleAffiliateWithdrawalSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+  
+    // Validate the withdrawal amount
+    if (!affiliateWithdrawalAmount || parseFloat(affiliateWithdrawalAmount) <= 0) {
+      toast.error("Please enter a valid withdrawal amount.");
+      return;
+    }
+  
+    // Redirect to the withdrawal request page with the amount and type as query parameters
+    navigate(`/withdrawal-request?amount=${affiliateWithdrawalAmount}&type=affiliate`);
+  };
+  
+  const handleVendorWithdrawalSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+  
+    // Validate the withdrawal amount
+    if (!vendorWithdrawalAmount || parseFloat(vendorWithdrawalAmount) <= 0) {
+      toast.error("Please enter a valid withdrawal amount.");
+      return;
+    }
+  
+    // Redirect to the withdrawal request page with the amount and type as query parameters
+    navigate(`/withdrawal-request?amount=${vendorWithdrawalAmount}&type=vendor`);
+  };
+
 
   // Fetch affiliate data from the backend
   useEffect(() => {
@@ -208,7 +248,7 @@ const DashboardPage: React.FC = () => {
               </div>
             </div>
             <div className="text-gray-600">Withdrawals only available on Saturdays</div>
-            <form className="mt-4">
+            <form onSubmit={handleAffiliateWithdrawalSubmit} className="mt-4">
               <label className="block text-gray-700 font-medium mb-2">Type Amount:</label>
               <input
                 type="number"
@@ -217,6 +257,8 @@ const DashboardPage: React.FC = () => {
                 min="1"
                 placeholder="Type Amount Here"
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-200"
+                value={affiliateWithdrawalAmount}
+                onChange={handleAffiliateWithdrawalAmountChange}
               />
               <p className="text-red-500 text-sm">Please ensure you type the amount you want to withdraw in <b>Naira</b></p>
               <button type="submit" className="mt-2 bg-purple-800 text-white px-4 py-2 rounded-md hover:bg-red-600 transition duration-300">
@@ -239,7 +281,7 @@ const DashboardPage: React.FC = () => {
               </div>
             </div>
             <div className="text-gray-600">Withdrawals only available on Saturdays</div>
-            <form className="mt-4">
+            <form onSubmit={handleVendorWithdrawalSubmit} className="mt-4">
               <label className="block text-gray-700 font-medium mb-2">Type Amount:</label>
               <input
                 type="number"
@@ -248,6 +290,8 @@ const DashboardPage: React.FC = () => {
                 min="1"
                 placeholder="Type Amount Here"
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-200"
+                value={vendorWithdrawalAmount}
+                onChange={handleVendorWithdrawalAmountChange}
               />
               <p className="text-red-500 text-sm">Please ensure you type the amount you want to withdraw in <b>Naira</b></p>
               <button type="submit" className="mt-2 bg-purple-800 text-white px-4 py-2 rounded-md hover:bg-red-600 transition duration-300">
