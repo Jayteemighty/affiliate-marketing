@@ -2,9 +2,11 @@ from django.db import models
 from django.contrib.auth import get_user_model
 from django.conf import settings
 from courses.models import Course
+from affiliates.models import Affiliate
 
 User = get_user_model()
 
+# models.py
 class WithdrawalRequest(models.Model):
     """Model for tracking withdrawal requests."""
     
@@ -25,7 +27,7 @@ class WithdrawalRequest(models.Model):
     account_number = models.CharField(max_length=50)
     account_name = models.CharField(max_length=255, default="Unknown")
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='Pending')
-    withdrawal_type = models.CharField(max_length=10, choices=TYPE_CHOICES, default='affiliate')  # New field
+    withdrawal_type = models.CharField(max_length=10, choices=TYPE_CHOICES, default='affiliate')
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -83,3 +85,20 @@ class Transaction(models.Model):
 
     def __str__(self):
         return f'{self.user.email} - {self.amount} - {self.status}'
+
+
+# Signals
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
+
+@receiver(pre_save, sender=WithdrawalRequest)
+def deduct_earnings_on_approval(sender, instance, **kwargs):
+    if instance.pk:  # Check if the instance already exists (i.e., it's being updated)
+        old_instance = WithdrawalRequest.objects.get(pk=instance.pk)
+        if old_instance.status != 'Approved' and instance.status == 'Approved':
+            affiliate = Affiliate.objects.get(user=instance.user)
+            if instance.withdrawal_type == 'affiliate':
+                affiliate.available_affiliate_earnings -= instance.amount
+            elif instance.withdrawal_type == 'vendor':
+                affiliate.available_vendor_earnings -= instance.amount
+            affiliate.save()

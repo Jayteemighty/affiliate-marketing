@@ -15,6 +15,9 @@ class Affiliate(models.Model):
     today_affiliate_earnings = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     overall_affiliate_earnings = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     available_affiliate_earnings = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    overall_vendor_earnings = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    available_vendor_earnings = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    total_withdrawals = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     withdrawal_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
 
     def __str__(self):

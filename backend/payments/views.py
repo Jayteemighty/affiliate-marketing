@@ -178,27 +178,33 @@ class PaymentCallbackView(APIView):
 
 
 class WithdrawalRequestView(generics.CreateAPIView):
-    """API for affiliates to request withdrawals."""
+    """API for affiliates and vendors to request withdrawals."""
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = WithdrawalRequestSerializer
 
     def perform_create(self, serializer):
         user = self.request.user
         affiliate = get_object_or_404(Affiliate, user=user)
-        
+
         # Get the withdrawal type and amount
         withdrawal_type = serializer.validated_data.get('withdrawal_type', 'affiliate')
         amount = serializer.validated_data['amount']
 
-        # Ensure the withdrawal amount does not exceed available earnings
-        if withdrawal_type == 'affiliate' and amount > affiliate.available_affiliate_earnings:
-            raise serializers.ValidationError({"amount": "Withdrawal amount exceeds available affiliate earnings."})
-        elif withdrawal_type == 'vendor' and amount > affiliate.available_vendor_earnings:
-            raise serializers.ValidationError({"amount": "Withdrawal amount exceeds available vendor earnings."})
-        
-        # Automatically set the user
-        serializer.save(user=user)
+        # Log the withdrawal type and amount
+        print(f"Withdrawal Type: {withdrawal_type}, Amount: {amount}")
 
+        # Ensuring the withdrawal amount does not exceed available earnings
+        if withdrawal_type == 'affiliate':
+            if amount > affiliate.available_affiliate_earnings:
+                raise serializers.ValidationError({"amount": "Withdrawal amount exceeds available affiliate earnings."})
+        elif withdrawal_type == 'vendor':
+            if amount > affiliate.available_vendor_earnings:
+                raise serializers.ValidationError({"amount": "Withdrawal amount exceeds available vendor earnings."})
+        else:
+            raise serializers.ValidationError({"withdrawal_type": "Invalid withdrawal type. Must be 'affiliate' or 'vendor'."})
+
+        # Automatically set the user and withdrawal type
+        serializer.save(user=user, withdrawal_type=withdrawal_type)
 
 class WithdrawalListView(generics.ListAPIView):
     """API to list withdrawal requests for the logged-in user."""
@@ -295,19 +301,3 @@ class TransactionStatusView(generics.ListAPIView):
             "affiliate_sales": affiliate_sales,
             "withdrawal_requests": withdrawal_requests,
         })
-
-
-from django.db.models.signals import pre_save
-from django.dispatch import receiver
-
-@receiver(pre_save, sender=WithdrawalRequest)
-def deduct_earnings_on_approval(sender, instance, **kwargs):
-    if instance.pk:  # Check if the instance already exists (i.e., it's being updated)
-        old_instance = WithdrawalRequest.objects.get(pk=instance.pk)
-        if old_instance.status != 'Approved' and instance.status == 'Approved':
-            affiliate = Affiliate.objects.get(user=instance.user)
-            if instance.withdrawal_type == 'affiliate':
-                affiliate.available_affiliate_earnings -= instance.amount
-            elif instance.withdrawal_type == 'vendor':
-                affiliate.available_vendor_earnings -= instance.amount
-            affiliate.save()
