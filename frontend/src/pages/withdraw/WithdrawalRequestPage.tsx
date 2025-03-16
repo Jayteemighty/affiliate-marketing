@@ -14,6 +14,7 @@ const WithdrawalRequestPage: React.FC = () => {
   const [bankName, setBankName] = useState("");
   const [accountNumber, setAccountNumber] = useState("");
   const [accountName, setAccountName] = useState("");
+  const [withdrawalType, setWithdrawalType] = useState("affiliate"); // Default to affiliate
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Toggle sidebar
@@ -21,55 +22,65 @@ const WithdrawalRequestPage: React.FC = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
-  // Extract the withdrawal amount from the query parameters
+  // Extract the withdrawal amount and type from the query parameters
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
     const amountParam = queryParams.get("amount");
+    const typeParam = queryParams.get("type");
+
     if (amountParam) {
       setAmount(amountParam);
+    }
+    if (typeParam) {
+      setWithdrawalType(typeParam);
     }
   }, [location]);
 
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+  
     // Validate form inputs
     if (!bankName || !accountNumber || !accountName) {
       toast.error("Please fill in all fields.");
       return;
     }
-
+  
     if (!amount || parseFloat(amount) <= 0) {
       toast.error("Please enter a valid withdrawal amount.");
       return;
     }
-
+  
     setIsSubmitting(true);
-
+  
     try {
       const token = localStorage.getItem("token");
       if (!token) {
         toast.error("Please log in to make a withdrawal request.");
         return;
       }
-
+  
+      // Log the request payload
+      const payload = {
+        amount: parseFloat(amount),
+        bank_name: bankName,
+        account_number: accountNumber,
+        account_name: accountName,
+        withdrawal_type: withdrawalType,
+      };
+      console.log("Request Payload:", payload);
+  
       // Send the withdrawal request to the backend
       const response = await axios.post(
         `${BASE_URL2}/api/payment/withdrawal-request/`,
-        {
-          amount: parseFloat(amount),
-          bank_name: bankName,
-          account_number: accountNumber,
-          account_name: accountName,
-        },
+        payload,
         {
           headers: {
             Authorization: `Token ${token}`,
           },
         }
       );
-
+  
       // Handle success
       if (response.status === 201) {
         toast.success("Withdrawal request submitted successfully!");
@@ -77,7 +88,7 @@ const WithdrawalRequestPage: React.FC = () => {
       }
     } catch (error) {
       console.error("Error submitting withdrawal request:", error);
-
+  
       // Display specific error messages from the backend
       if (axios.isAxiosError(error)) {
         const errorMessage = error.response?.data?.error || "Failed to submit withdrawal request. Please try again.";
