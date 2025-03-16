@@ -8,11 +8,7 @@ from .serializers import CourseSerializer, LessonSerializer, UserRegisteredCours
 class CourseListView(generics.ListCreateAPIView):
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
-    permission_classes = [permissions.IsAuthenticated]
-
-    def get_queryset(self):
-        # Only return courses owned by the logged-in user
-        return Course.objects.filter(instructor=self.request.user)
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def perform_create(self, serializer):
         if self.request.user.is_staff:  # Only admins can create courses
@@ -98,6 +94,7 @@ class CourseRequestCreateView(generics.CreateAPIView):
         serializer.save(user=self.request.user)
 
 
+# Get User Products
 class UserProductsView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 

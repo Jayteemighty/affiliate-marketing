@@ -14,12 +14,18 @@ class WithdrawalRequest(models.Model):
         ('Rejected', 'Rejected'),
     ]
 
+    TYPE_CHOICES = [
+        ('affiliate', 'Affiliate Earnings'),
+        ('vendor', 'Vendor Earnings'),
+    ]
+
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="withdrawals")
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     bank_name = models.CharField(max_length=255)
     account_number = models.CharField(max_length=50)
-    account_name = models.CharField(max_length=255, default="Unknown")  # Add a default value
+    account_name = models.CharField(max_length=255, default="Unknown")
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='Pending')
+    withdrawal_type = models.CharField(max_length=10, choices=TYPE_CHOICES, default='affiliate')  # New field
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
