@@ -17,7 +17,7 @@ import BecomeVendorPage from "./pages/vendor/vendor";
 import ProductsPage from "./pages/products/index";
 import WithdrawalsPage from "./pages/transaction/withdrawals";
 import ProfilePage from "./pages/profile/index";
-import UploadCoursePage from "./pages/courses/uploadcourses";
+// import UploadCoursePage from "./pages/courses/uploadcourses";
 import CourseDetails from "./pages/market/[id]";
 import CourseAffiliatePage from "./pages/market/affiliate/[courseId]/[uniqueToken]";
 import PaymentSuccessPage from "./pages/payment/success";
@@ -49,7 +49,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         <Route path="/manage-products" element={<ProductsPage />} />
         <Route path="/withdrawals" element={<WithdrawalsPage />} />
         <Route path="/profile" element={<ProfilePage />} />
-        <Route path="/upload-course" element={<UploadCoursePage />} />
+        {/* <Route path="/upload-course" element={<UploadCoursePage />} /> */}
         <Route path="/course/:id" element={<CourseDetails />} />
         <Route path="/course/:courseId/:uniqueToken" element={<CourseAffiliatePage />} />
         <Route path="/payment/success" element={<PaymentSuccessPage />} />

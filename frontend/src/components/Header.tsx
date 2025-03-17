@@ -108,7 +108,7 @@ const Header: React.FC = () => {
               </NavLink>
             </li>
             {/* UploadCourses Link */}
-            <li>
+            {/* <li>
               <NavLink
                 to="/upload-course"
                 className={({ isActive }) =>
@@ -123,7 +123,7 @@ const Header: React.FC = () => {
               >
                 Upload Courses
               </NavLink>
-            </li>
+            </li> */}
             {/* Vendors Link */}
             <li>
               <NavLink
