@@ -12,7 +12,7 @@ This project is a **Fullstack web application** built with **React** (frontend) 
 - **Frontend:**
   - React
   - TypeScript
-  - Tailwind CSS (or any other CSS framework you're using)
+  - Tailwind CSS
 - **Backend:**
   - Python
   - Django
