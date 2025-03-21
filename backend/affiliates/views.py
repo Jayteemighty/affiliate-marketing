@@ -14,6 +14,8 @@ from payments.models import Withdrawal
 from django.db.models import Sum
 from django.utils import timezone
 from django.db.models import Count
+from django.db.models import Q
+
 
 import logging
 logger = logging.getLogger(__name__)
@@ -151,7 +153,16 @@ class AffiliateSalesView(generics.ListAPIView):
 
     def get_queryset(self):
         affiliate = get_object_or_404(Affiliate, user=self.request.user)
-        return Sale.objects.filter(vendor=affiliate.user)
+        queryset = Sale.objects.filter(affiliate_seller=affiliate.user)
+
+        # Add search functionality by referred_user_email
+        search_email = self.request.query_params.get('search', None)
+        if search_email:
+            queryset = queryset.filter(
+                Q(referral__referred_user_email__icontains=search_email)
+            )
+
+        return queryset
 
 
 from rest_framework.response import Response

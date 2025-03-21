@@ -29,6 +29,13 @@ class ReferralSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class SaleSerializer(serializers.ModelSerializer):
+    referred_user_email = serializers.SerializerMethodField()
+
     class Meta:
         model = Sale
         fields = '__all__'
+
+    def get_referred_user_email(self, obj):
+        if obj.referral:
+            return obj.referral.referred_user_email
+        return None

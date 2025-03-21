@@ -5,6 +5,7 @@ import { BASE_URL2 } from "../../libs/constants";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+// Define the transaction data structure
 interface TransactionData {
   user_payments: {
     id: number;
@@ -23,6 +24,7 @@ interface TransactionData {
     amount: number;
     commission: number;
     date: string;
+    referred_user_email: string; // Add this field
   }[];
   withdrawal_requests: {
     id: number;
@@ -36,6 +38,10 @@ const TransactionStatusPage: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [transactionData, setTransactionData] = useState<TransactionData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [searchEmail, setSearchEmail] = useState(""); // State for search input
+  const [filteredSales, setFilteredSales] = useState<
+    { id: number; amount: number; commission: number; date: string; referred_user_email: string }[]
+  >([]);
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -49,14 +55,12 @@ const TransactionStatusPage: React.FC = () => {
         toast.error("Please log in to view your transaction status.");
         return;
       }
-
       try {
         const response = await axios.get(`${BASE_URL2}/api/payment/transaction-status/`, {
           headers: {
             Authorization: `Token ${token}`,
           },
         });
-
         setTransactionData(response.data);
       } catch (error) {
         toast.error("Failed to fetch transaction data. Please try again.");
@@ -64,15 +68,28 @@ const TransactionStatusPage: React.FC = () => {
         setIsLoading(false);
       }
     };
-
     fetchTransactionData();
   }, []);
+
+  // Function to handle the search
+  const handleSearch = () => {
+    if (!transactionData) return;
+
+    // Filter affiliate sales based on the searchEmail
+    const filtered = transactionData.affiliate_sales.filter((sale) =>
+      sale.referred_user_email.toLowerCase().includes(searchEmail.toLowerCase())
+    );
+    setFilteredSales(filtered);
+  };
 
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-screen">
         <div className="text-center">
-          <div className="spinner-border animate-spin inline-block w-8 h-8 border-4 rounded-full" role="status">
+          <div
+            className="spinner-border animate-spin inline-block w-8 h-8 border-4 rounded-full"
+            role="status"
+          >
             <span className="visually-hidden"></span>
           </div>
           <p className="mt-2">Loading transaction status...</p>
@@ -93,7 +110,6 @@ const TransactionStatusPage: React.FC = () => {
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
       <Sidebar isOpen={isSidebarOpen} onClose={toggleSidebar} />
-
       {/* Main Content Area */}
       <div className="flex-grow p-4 md:p-8 overflow-y-auto ml-0 md:ml-64">
         {/* Hamburger Menu Button (Mobile Only) */}
@@ -116,8 +132,106 @@ const TransactionStatusPage: React.FC = () => {
             ></path>
           </svg>
         </button>
-
         <h1 className="text-2xl md:text-3xl font-bold mb-4">Transaction Status</h1>
+
+        {/* Search Bar and Button for Affiliate Sales */}
+        <div className="mb-6">
+          <div className="flex items-center space-x-4">
+            <input
+              type="text"
+              placeholder="Search by referred user email..."
+              value={searchEmail}
+              onChange={(e) => setSearchEmail(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-200"
+            />
+            <button
+              onClick={handleSearch}
+              className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+            >
+              Search
+            </button>
+          </div>
+        </div>
+
+        {/* Display Searched Affiliate Sales */}
+        {filteredSales.length > 0 && (
+          <div className="mb-8">
+            <h2 className="text-xl font-semibold mb-4">Searched Affiliate Sales</h2>
+            <div className="bg-white shadow-md rounded-lg overflow-hidden">
+              <table className="min-w-full">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Amount
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Commission
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Referred User Email
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Date
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {filteredSales.map((sale) => (
+                    <tr key={sale.id}>
+                      <td className="px-6 py-4 whitespace-nowrap">₦{sale.amount}</td>
+                      <td className="px-6 py-4 whitespace-nowrap">₦{sale.commission}</td>
+                      <td className="px-6 py-4 whitespace-nowrap">{sale.referred_user_email}</td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {new Date(sale.date).toLocaleString()}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* Affiliate Sales Table */}
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold mb-4">Affiliate Sales</h2>
+          {transactionData.affiliate_sales.length > 0 ? (
+            <div className="bg-white shadow-md rounded-lg overflow-hidden">
+              <table className="min-w-full">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Amount
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Commission
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Referred User Email
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Date
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {transactionData.affiliate_sales.map((sale) => (
+                    <tr key={sale.id}>
+                      <td className="px-6 py-4 whitespace-nowrap">₦{sale.amount}</td>
+                      <td className="px-6 py-4 whitespace-nowrap">₦{sale.commission}</td>
+                      <td className="px-6 py-4 whitespace-nowrap">{sale.referred_user_email}</td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {new Date(sale.date).toLocaleString()}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <p className="text-gray-600">No affiliate sales found.</p>
+          )}
+        </div>
 
         {/* User Payments Table */}
         <div className="mb-8">
@@ -127,9 +241,15 @@ const TransactionStatusPage: React.FC = () => {
               <table className="min-w-full">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Amount
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Status
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Date
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
@@ -137,7 +257,9 @@ const TransactionStatusPage: React.FC = () => {
                     <tr key={payment.id}>
                       <td className="px-6 py-4 whitespace-nowrap">₦{payment.amount}</td>
                       <td className="px-6 py-4 whitespace-nowrap">{payment.status}</td>
-                      <td className="px-6 py-4 whitespace-nowrap">{new Date(payment.created_at).toLocaleString()}</td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {new Date(payment.created_at).toLocaleString()}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -156,9 +278,15 @@ const TransactionStatusPage: React.FC = () => {
               <table className="min-w-full">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Amount
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Status
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Date
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
@@ -166,7 +294,9 @@ const TransactionStatusPage: React.FC = () => {
                     <tr key={payment.id}>
                       <td className="px-6 py-4 whitespace-nowrap">₦{payment.amount}</td>
                       <td className="px-6 py-4 whitespace-nowrap">{payment.status}</td>
-                      <td className="px-6 py-4 whitespace-nowrap">{new Date(payment.created_at).toLocaleString()}</td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {new Date(payment.created_at).toLocaleString()}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -174,35 +304,6 @@ const TransactionStatusPage: React.FC = () => {
             </div>
           ) : (
             <p className="text-gray-600">No course payments found.</p>
-          )}
-        </div>
-
-        {/* Affiliate Sales Table */}
-        <div className="mb-8">
-          <h2 className="text-xl font-semibold mb-4">Affiliate Sales</h2>
-          {transactionData.affiliate_sales.length > 0 ? (
-            <div className="bg-white shadow-md rounded-lg overflow-hidden">
-              <table className="min-w-full">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Commission</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200">
-                  {transactionData.affiliate_sales.map((sale) => (
-                    <tr key={sale.id}>
-                      <td className="px-6 py-4 whitespace-nowrap">₦{sale.amount}</td>
-                      <td className="px-6 py-4 whitespace-nowrap">₦{sale.commission}</td>
-                      <td className="px-6 py-4 whitespace-nowrap">{new Date(sale.date).toLocaleString()}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <p className="text-gray-600">No affiliate sales found.</p>
           )}
         </div>
 
@@ -214,9 +315,15 @@ const TransactionStatusPage: React.FC = () => {
               <table className="min-w-full">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Amount
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Status
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Date
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
@@ -224,7 +331,9 @@ const TransactionStatusPage: React.FC = () => {
                     <tr key={request.id}>
                       <td className="px-6 py-4 whitespace-nowrap">₦{request.amount}</td>
                       <td className="px-6 py-4 whitespace-nowrap">{request.status}</td>
-                      <td className="px-6 py-4 whitespace-nowrap">{new Date(request.created_at).toLocaleString()}</td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {new Date(request.created_at).toLocaleString()}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
