@@ -3,6 +3,7 @@ from .models import Course, Lesson, UserRegisteredCourse, CourseRequest
 from rest_framework import serializers
 from .models import Course
 from affiliates.models import Commission
+from django.conf import settings
 
 class CourseSerializer(serializers.ModelSerializer):
     instructor_name = serializers.SerializerMethodField()
@@ -23,10 +24,15 @@ class CourseSerializer(serializers.ModelSerializer):
             return 0
 
 class LessonSerializer(serializers.ModelSerializer):
+    video = serializers.SerializerMethodField()
+    
     class Meta:
         model = Lesson
         fields = '__all__'
         read_only_fields = ['course']
+    
+    def get_video(self, obj):
+        return obj.get_video_url()
 
 class UserRegisteredCourseSerializer(serializers.ModelSerializer):
     class Meta:

@@ -1,3 +1,4 @@
+import os
 from django.conf import settings
 from django.db import models
 from django.contrib.auth import get_user_model
@@ -28,8 +29,12 @@ class Lesson(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField(default="")
     content = models.TextField()
-    video = CloudinaryField(resource_type="video", folder="course_videos") # URL to the lesson video
+    video = CloudinaryField(resource_type="video", folder="course_videos")
     created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    
+    def get_video_url(self):
+        # Construct the full Cloudinary URL
+        return f"https://res.cloudinary.com/{os.getenv('cloud_name')}/video/upload/v1742647788/{self.video}.mp4"
 
     def __str__(self):
         return f"{self.course.title} - {self.title}"
