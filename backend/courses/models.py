@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.db import models
 from django.contrib.auth import get_user_model
+from cloudinary.models import CloudinaryField
 
 User = get_user_model()
 
@@ -25,8 +26,10 @@ class Lesson(models.Model):
 
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="lessons")
     title = models.CharField(max_length=255)
+    description = models.TextField(default="")
     content = models.TextField()
-    video_url = models.URLField(blank=True, null=True)  # URL to the lesson video
+    video = CloudinaryField(resource_type="video", folder="course_videos") # URL to the lesson video
+    created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 
     def __str__(self):
         return f"{self.course.title} - {self.title}"
@@ -38,6 +41,9 @@ class UserRegisteredCourse(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="registered_courses")
     course = models.ForeignKey("Course", on_delete=models.CASCADE, related_name="registrations")
     created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        unique_together = ('user', 'course')
 
     def __str__(self):
         return f"{self.user.email} - {self.course.title}"

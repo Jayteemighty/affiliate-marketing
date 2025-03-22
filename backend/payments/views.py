@@ -14,7 +14,7 @@ from affiliates.models import Affiliate
 from .models import Payment, WithdrawalRequest, CustomerAccount, Transaction
 from .serializers import PaymentSerializer, WithdrawalRequestSerializer, CustomerAccountSerializer
 from affiliates.models import Referral, Sale, Commission, AffiliateCourse
-from courses.models import Course
+from courses.models import Course, UserRegisteredCourse
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from affiliates.serializers import SaleSerializer
@@ -121,6 +121,11 @@ class PaymentCallbackView(APIView):
                 unique_token = metadata.get('unique_token')
                 course_id = metadata.get('course_id')
                 referred_user_email = metadata.get('referred_user_email')
+                
+                # Register the user for the course
+                course_id = response_data['data']['metadata'].get('course_id')
+                course = get_object_or_404(Course, id=course_id)
+                UserRegisteredCourse.objects.get_or_create(user=payment.user, course=course)
 
                 if unique_token and course_id and referred_user_email:
                     # Find the affiliate course using the unique token
@@ -162,6 +167,7 @@ class PaymentCallbackView(APIView):
                             commission=commission_amount,
                             referral=referral
                         )
+
 
                 # Redirect to frontend success page
                 return HttpResponseRedirect(f"{settings.FRONTEND_URL}/payment/success")
@@ -274,7 +280,7 @@ class TransactionStatusView(generics.ListAPIView):
         # Get all payments made by the user
         user_payments = Payment.objects.filter(user=user)
         # Get payments for courses owned by the user (if they are an instructor)
-        course_payments = Payment.objects.filter(course__instructor=user)
+        course_payments = Payment.objects.filter(course__instructor=user, status='completed')
         # Get affiliate sales for the user (if they are an affiliate)
         affiliate_sales = Sale.objects.filter(affiliate_seller=user)
         # Get withdrawal requests for the user

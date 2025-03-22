@@ -164,13 +164,6 @@ class AffiliateSalesView(generics.ListAPIView):
 
         return queryset
 
-
-from rest_framework.response import Response
-from rest_framework import status
-from django.utils import timezone
-from django.db.models import Count
-from .models import Affiliate, Sale
-
 class AffiliateLeaderboardView(APIView):
     """API to get the affiliate leaderboard."""
     permission_classes = [IsAuthenticated]

@@ -3,6 +3,10 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from .models import Course, Lesson, UserRegisteredCourse, CourseRequest
 from .serializers import CourseSerializer, LessonSerializer, UserRegisteredCourseSerializer, CourseRequestSerializer
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.exceptions import PermissionDenied
+from django.shortcuts import get_object_or_404
+
 
 # Course Views
 class CourseListView(generics.ListCreateAPIView):
@@ -40,6 +44,12 @@ class LessonListView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         course_id = self.kwargs['course_id']
+        course = get_object_or_404(Course, id=course_id)
+
+        # Check if the user has access to the course
+        if not UserRegisteredCourse.objects.filter(user=self.request.user, course=course).exists():
+            raise PermissionDenied("You do not have access to this course.")
+
         return Lesson.objects.filter(course_id=course_id)
 
     def perform_create(self, serializer):
@@ -54,6 +64,16 @@ class LessonDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    
+    def get_object(self):
+        lesson = super().get_object()
+        course = lesson.course
+
+        # Check if the user has access to the course
+        if not UserRegisteredCourse.objects.filter(user=self.request.user, course=course).exists():
+            raise PermissionDenied("You do not have access to this course.")
+
+        return lesson
 
     def perform_update(self, serializer):
         if self.request.user.is_staff:  # Only admins can update lessons
@@ -66,6 +86,7 @@ class LessonDetailView(generics.RetrieveUpdateDestroyAPIView):
             instance.delete()
         else:
             raise permissions.PermissionDenied("Only admins can delete lessons.")
+
 
 # UserRegisteredCourse Views
 class UserRegisteredCourseListView(generics.ListCreateAPIView):
@@ -114,3 +135,12 @@ class UserProductsView(APIView):
         }
 
         return Response(response_data)
+
+# Course Access
+class CheckCourseAccessView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, course_id):
+        user = request.user
+        has_access = UserRegisteredCourse.objects.filter(user=user, course_id=course_id).exists()
+        return Response({"has_access": has_access})

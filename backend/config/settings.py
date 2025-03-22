@@ -14,6 +14,16 @@ from pathlib import Path
 # import dj_database_url
 from dotenv import load_dotenv
 load_dotenv()
+import cloudinary
+import cloudinary.uploader
+from cloudinary.utils import cloudinary_url
+
+cloudinary.config(
+    cloud_name=os.getenv("cloud_name"),
+    api_key=os.getenv("api_key"),
+    api_secret=os.getenv("api_secret"),
+    secure=True,
+)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent

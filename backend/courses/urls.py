@@ -12,6 +12,7 @@ urlpatterns = [
 
     # UserRegisteredCourse Endpoints
     path('user-registered-courses/', views.UserRegisteredCourseListView.as_view(), name='user-registered-course-list'),
+    path('check-access/<int:course_id>/', views.CheckCourseAccessView.as_view(), name='check-access'),
 
     # CourseRequest Endpoints
     path('course-requests/', views.CourseRequestListView.as_view(), name='course-request-list'),
