@@ -11,7 +11,7 @@ interface Lesson {
   title: string;
   description: string;
   content: string;
-  video: string; // URL to the lesson video
+  video: string; // Full Cloudinary video URL
 }
 
 const VideoLessonPage: React.FC = () => {
@@ -98,12 +98,15 @@ const VideoLessonPage: React.FC = () => {
       <Sidebar isOpen={isSidebarOpen} onClose={toggleSidebar} />
       <div className="flex-grow overflow-y-auto ml-0 md:ml-64">
         <div className="p-6 max-w-4xl mx-auto">
+          {/* Lesson Title */}
           <h1 className="text-3xl font-bold mb-6 text-gray-800">{lesson.title}</h1>
+
+          {/* Lesson Description */}
           <p className="text-gray-600 mb-6">{lesson.description}</p>
 
           {/* Video Player */}
           <div className="bg-white p-6 rounded-lg shadow-md">
-            <video controls className="w-full">
+            <video controls className="w-full rounded-lg">
               <source src={lesson.video} type="video/mp4" />
               Your browser does not support the video tag.
             </video>

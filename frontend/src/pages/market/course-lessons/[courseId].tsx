@@ -10,13 +10,18 @@ interface Lesson {
   id: number;
   title: string;
   description: string;
-  video: string; // URL to the lesson video
-  thumbnail?: string; // Optional thumbnail for the lesson
+  video: string;
+}
+
+interface Course {
+  id: number;
+  title: string;
 }
 
 const CourseLessonsPage: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [lessons, setLessons] = useState<Lesson[]>([]);
+  const [course, setCourse] = useState<Course | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [hasAccess, setHasAccess] = useState(false);
   const { courseId } = useParams<{ courseId: string }>();
@@ -27,16 +32,27 @@ const CourseLessonsPage: React.FC = () => {
   };
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-
-    if (!token) {
-      toast.error("Your session has expired. Please log in again.");
-      navigate("/login");
-      return;
-    }
-
     const fetchLessons = async () => {
       try {
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+          toast.error("Your session has expired. Please log in again.");
+          navigate("/login");
+          return;
+        }
+
+        // Fetch course details
+        const courseResponse = await axios.get(
+          `${BASE_URL2}/api/course/courses/${courseId}/`,
+          {
+            headers: {
+              Authorization: `Token ${token}`,
+            },
+          }
+        );
+        setCourse(courseResponse.data);
+
         // Check if the user has access to the course
         const accessResponse = await axios.get(
           `${BASE_URL2}/api/course/check-access/${courseId}/`,
@@ -66,7 +82,7 @@ const CourseLessonsPage: React.FC = () => {
         );
         setLessons(lessonsResponse.data);
       } catch (error) {
-        toast.error("Failed to fetch lessons. Please try again later.");
+        toast.error("Failed to fetch data. Please try again later.");
       } finally {
         setIsLoading(false);
       }
@@ -97,24 +113,37 @@ const CourseLessonsPage: React.FC = () => {
       <Sidebar isOpen={isSidebarOpen} onClose={toggleSidebar} />
       <div className="flex-grow overflow-y-auto ml-0 md:ml-64">
         <div className="p-6 max-w-4xl mx-auto">
-          <h1 className="text-3xl font-bold mb-6 text-gray-800">Course Lessons</h1>
+          {/* Course Title */}
+          <h1 className="text-3xl font-bold mb-6 text-gray-800">
+            Course Lessons: {course ? course.title : "Loading..."}
+          </h1>
+
+          {/* Lessons List */}
           <div className="space-y-4">
-            {lessons.map((lesson) => (
+            {lessons.map((lesson, index) => (
               <div
                 key={lesson.id}
-                className="bg-white p-6 rounded-lg shadow-md cursor-pointer hover:shadow-lg transition-shadow"
+                className="bg-white p-4 rounded-lg shadow-md cursor-pointer hover:shadow-lg transition-shadow"
                 onClick={() => navigate(`/market/course-lessons/${courseId}/${lesson.id}`)}
               >
-                <div className="flex items-center space-x-4">
-                  {lesson.thumbnail && (
-                    <img
-                      src={lesson.thumbnail}
-                      alt={lesson.title}
-                      className="w-32 h-20 object-cover rounded-md"
+                <div className="flex items-start space-x-4">
+                  {/* Video Preview */}
+                  <div className="w-48 flex-shrink-0">
+                    <video
+                      src={lesson.video}
+                      className="w-full h-24 object-cover rounded-md"
+                      controls={false}
+                      muted
+                      loop
+                      playsInline
                     />
-                  )}
-                  <div>
-                    <h2 className="text-xl font-semibold mb-2">{lesson.title}</h2>
+                  </div>
+
+                  {/* Lesson Details */}
+                  <div className="flex-grow">
+                    <h2 className="text-xl font-semibold mb-2">
+                      Lesson {index + 1}: {lesson.title}
+                    </h2>
                     <p className="text-gray-600">{lesson.description}</p>
                   </div>
                 </div>
