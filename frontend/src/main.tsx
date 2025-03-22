@@ -25,6 +25,8 @@ import PaymentFailurePage from "./pages/payment/failure";
 import PromoteCoursePage from "./pages/market/PromoteCoursePage";
 import WithdrawalRequestPage from "./pages/withdraw/WithdrawalRequestPage";
 import ForgotPasswordPage from "./pages/authentication/forgot-password/ForgotPassword";
+import CourseLessonsPage from "./pages/market/course-lessons/[courseId]";
+import VideoLessonPage from "./pages/market/course-lessons/[courseId]/[lessonId]";
 
 import "./index.css";
 
@@ -57,6 +59,8 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         <Route path="/market/promote/:courseId" element={<PromoteCoursePage />} />
         <Route path="/withdrawal-request" element={<WithdrawalRequestPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/market/course-lessons/:courseId" element={<CourseLessonsPage />} />
+        <Route path="/market/course-lessons/:courseId/:lessonId" element={<VideoLessonPage />} />
         {/* Add more routes here */}
       </Routes>
     </BrowserRouter>

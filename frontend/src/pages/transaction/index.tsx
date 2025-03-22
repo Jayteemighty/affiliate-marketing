@@ -61,6 +61,7 @@ const TransactionStatusPage: React.FC = () => {
             Authorization: `Token ${token}`,
           },
         });
+        console.log(response.data);
         setTransactionData(response.data);
       } catch (error) {
         toast.error("Failed to fetch transaction data. Please try again.");
