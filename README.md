@@ -15,7 +15,6 @@ This project is a **Fullstack web application** built with **React** (frontend) 
   - Tailwind CSS
 - **Backend:**
   - Python
-  - Django
   - Django REST Framework (DRF)
 - **Database:**
   - SQLite (default for development) or PostgreSQL (for production)
